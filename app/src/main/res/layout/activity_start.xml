@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+
+    <Button
+        android:id="@+id/btSingInUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btSingIn_Up"
+        android:textSize="17sp" />
+
+    <Button
+        android:id="@+id/btPersAcc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/btPersAcc"
+        android:textSize="17sp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/btMenu"
+        android:textSize="17sp" />
+
+    <Button
+        android:id="@+id/btAboutUs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+
+
+        android:text="@string/btAboutUs"
+        android:textSize="17sp"
+        android:visibility="visible" />
+
+
+
+
+</LinearLayout>

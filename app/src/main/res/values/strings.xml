@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">ITrySoHard</string>
+
+    #for regauth activite (start)
+    <string name="tvReg">Регистрация</string>
+    <string name="etName_Reg">Введите имя</string>
+    <string name="etEmail_Reg">Введите email</string>
+    <string name="etPass_Reg">Введите пароль</string>
+    <string name="btReg">Зарегистрироваться</string>
+    <string name="tvAuth">Войти</string>
+    <string name="tvLinkSingIn_onReg">Уже есть аккаунт? Войти</string>
+    <string name="tvLinkSingIn_onReg_change">Есть аккаунт? Войти</string>
+    <string name="tvLinkSingUp_onReg_change">Нет аккаунта? Регистрация</string>
+    <string name="btReg_changeSingIn">Войти</string>
+    #for regauth activite (finish)
+
+    #for startactiviry(start)
+    <string name="btSingIn_Up">Регистрация/Вход</string>
+    <string name="btPersAcc">Личный кабинет</string>
+    <string name="btMenu">Меню</string>
+    <string name="btAboutUs">О нас</string>
+    #for startactiviry(start)
+    #for persactiviry(start)
+    <string name="btExitAcc">Выход</string>
+    #for persactiviry(star)
+
+</resources>

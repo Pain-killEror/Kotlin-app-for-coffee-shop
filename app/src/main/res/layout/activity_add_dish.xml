@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddDishActivity"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Image Preview -->
+        <ImageView
+            android:id="@+id/ivDishPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop" />
+
+        <!-- Button to Choose Photo -->
+        <Button
+            android:id="@+id/btnChoosePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Выбрать фото" />
+
+        <!-- Dish Name -->
+        <EditText
+            android:id="@+id/etDishName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Название блюда"
+            android:inputType="text"
+            android:layout_marginTop="16dp" />
+
+        <!-- Dish Description -->
+        <EditText
+            android:id="@+id/etDishDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Описание блюда"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:layout_marginTop="8dp" />
+
+        <!-- Dish Price -->
+        <EditText
+            android:id="@+id/etDishPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Цена блюда"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/btnSaveDish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сохранить блюдо"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

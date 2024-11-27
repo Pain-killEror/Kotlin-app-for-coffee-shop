@@ -1,0 +1,31 @@
+<!-- activity_menu.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btnBreakfast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Завтраки"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"/>
+
+    <Button
+        android:id="@+id/btnDesserts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Десерты"
+        android:layout_below="@id/btnBreakfast"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+    <Button
+        android:id="@+id/btnDrinks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Напитки"
+        android:layout_below="@id/btnDesserts"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+</RelativeLayout>
