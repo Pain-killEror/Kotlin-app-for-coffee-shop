@@ -17,9 +17,21 @@ interface DishApi {
         @Part("name") name: RequestBody,
         @Part("description") description: RequestBody,
         @Part("price") price: RequestBody,
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part,
+        @Part ("category") category: RequestBody
     ): Call<DishServ>
 
     @DELETE("/dish/delete/{id}")
     fun deleteDish(@Path("id") id: Int): Call<Void>
+
+    @Multipart
+    @PUT("/dish/update/{id}")
+    fun updateDish(
+        @Path("id") id: Int,
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part image: MultipartBody.Part? // image is optional
+    ): Call<DishServ>
 }

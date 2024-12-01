@@ -1,16 +1,12 @@
-package com.example.itrysohard
+package com.example.itrysohard.justactivity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.itrysohard.databinding.ActivityStartBinding
 
 class StartActivity : AppCompatActivity() {
@@ -20,6 +16,12 @@ class StartActivity : AppCompatActivity() {
     private var userName: String? = null
     private var userEmail: String? = null
     private var isAdmin: Boolean = false
+
+
+
+
+
+
 
     private lateinit var loginActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var logoutActivityResultLauncher: ActivityResultLauncher<Intent>

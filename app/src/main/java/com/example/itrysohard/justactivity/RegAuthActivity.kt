@@ -1,4 +1,4 @@
-package com.example.itrysohard
+package com.example.itrysohard.justactivity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityRegauthBinding
 import com.example.myappforcafee.model.User
 import com.example.myappforcafee.retrofit.RetrofitService

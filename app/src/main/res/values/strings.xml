@@ -24,4 +24,10 @@
     <string name="btExitAcc">Выход</string>
     #for persactiviry(star)
 
+    <string-array name="dish_categories">
+        <item>Завтрак</item>
+        <item>Десерт</item>
+        <item>Напиток</item>
+    </string-array>
+
 </resources>

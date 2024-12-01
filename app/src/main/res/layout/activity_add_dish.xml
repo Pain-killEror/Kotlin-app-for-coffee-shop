@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddDishActivity"
+    tools:context=".justactivity.AddDishActivity"
     android:padding="16dp">
 
     <LinearLayout
@@ -54,12 +54,20 @@
             android:inputType="numberDecimal"
             android:layout_marginTop="8dp" />
 
+        <!-- Dish Category Spinner -->
+        <Spinner
+            android:id="@+id/spinnerDishCategory"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="50dp" />
+
         <!-- Save Button -->
         <Button
             android:id="@+id/btnSaveDish"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Сохранить блюдо"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="100dp"
+            android:text="Сохранить блюдо" />
+
     </LinearLayout>
 </ScrollView>

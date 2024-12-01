@@ -1,31 +1,74 @@
-<!-- activity_menu.xml -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnBreakfast"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Завтраки"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnDesserts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Десерты"
-        android:layout_below="@id/btnBreakfast"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        <!-- Категория Завтраки -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Завтраки"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"
+            />
 
-    <Button
-        android:id="@+id/btnDrinks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Напитки"
-        android:layout_below="@id/btnDesserts"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
-</RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewBreakfast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:scrollbars="horizontal" />
+
+        <!-- Категория Десерты -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Десерты"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDesserts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:scrollbars="horizontal" />
+
+        <!-- Категория Напитки -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Напитки"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:padding="8dp"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDrinks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:scrollbars="horizontal" />
+
+        <Button
+            android:id="@+id/btnAddDish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить блюдо"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+</ScrollView>

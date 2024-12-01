@@ -1,13 +1,11 @@
-package com.example.itrysohard
+package com.example.itrysohard.justactivity
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityPersAccBinding
 
 class PersAccActivity : AppCompatActivity() {
