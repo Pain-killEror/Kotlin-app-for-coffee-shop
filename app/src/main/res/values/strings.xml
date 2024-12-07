@@ -30,4 +30,7 @@
         <item>Напиток</item>
     </string-array>
 
+
+    <string name='cart'></string>
+
 </resources>

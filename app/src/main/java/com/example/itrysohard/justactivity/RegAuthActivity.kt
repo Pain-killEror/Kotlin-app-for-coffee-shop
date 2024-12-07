@@ -8,12 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityRegauthBinding
-import com.example.myappforcafee.model.User
-import com.example.myappforcafee.retrofit.RetrofitService
-import com.example.myappforcafee.retrofit.UserApi
+import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.model.User
+import com.example.itrysohard.retrofitforDU.RetrofitService
+import com.example.itrysohard.retrofitforDU.UserApi
+import org.mindrot.jbcrypt.BCrypt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 class RegAuthActivity : AppCompatActivity() {
 
@@ -56,34 +59,47 @@ class RegAuthActivity : AppCompatActivity() {
             return
         }
 
-        checkUserExistsByName(name) { existsByName ->
-            if (existsByName) {
-                showToast("Имя уже занято")
-                return@checkUserExistsByName
-            }
-
-            checkUserExistsByEmail(email) { existsByEmail ->
-                if (existsByEmail) {
-                    showToast("Пользователь с такой почтой уже существует")
-                    return@checkUserExistsByEmail
+        // Проверка существования пользователя
+        userApi.getAllUsers().enqueue(object : Callback<List<User>> {
+            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
+                if (!response.isSuccessful) {
+                    showToast("Ошибка проверки пользователей: ${response.message()}")
+                    return
                 }
 
+                val users = response.body() ?: emptyList()
+
+                // Проверяем, есть ли пользователь с таким именем или почтой
+                if (users.any { it.name.equals(name, ignoreCase = true) }) {
+                    showToast("Имя уже занято")
+                    return
+                }
+                if (users.any { it.email.equals(email, ignoreCase = true) }) {
+                    showToast("Пользователь с такой почтой уже существует")
+                    return
+                }
+
+                // Если имя и почта свободны, создаем нового пользователя
                 val newUser = User(name, email, password)
                 userApi.save(newUser).enqueue(object : Callback<User> {
                     override fun onResponse(call: Call<User>, response: Response<User>) {
                         if (response.isSuccessful) {
+                            val savedUser = response.body() ?: return
+
+                            // Проверяем ID: если это 1 или 2, назначаем администратором
+                            CurrentUser.isAdmin = (savedUser.id == 1L || savedUser.id == 2L)
+
                             showToast("Регистрация успешна")
+                            CurrentUser.user = savedUser
                             clearFields()
 
-                            // Отправляем результат в StartActivity
                             val resultIntent = Intent().apply {
-                                //putExtra("isUserLoggedIn", true)
-                                putExtra("userName", name)
-                                putExtra("userEmail", email)
-                                putExtra("isAdmin", false) // Здесь можно указать администраторский статус
+                                putExtra("userName", savedUser.name)
+                                putExtra("userEmail", savedUser.email)
+                                putExtra("isAdmin", CurrentUser.isAdmin)
                             }
                             setResult(RESULT_OK, resultIntent)
-                            finish() // Завершаем активность
+                            finish()
                         } else {
                             showToast("Ошибка регистрации: ${response.message()}")
                         }
@@ -94,7 +110,11 @@ class RegAuthActivity : AppCompatActivity() {
                     }
                 })
             }
-        }
+
+            override fun onFailure(call: Call<List<User>>, t: Throwable) {
+                showToast("Ошибка подключения: ${t.message}")
+            }
+        })
     }
 
     private fun loginUser() {
@@ -106,54 +126,36 @@ class RegAuthActivity : AppCompatActivity() {
             return
         }
 
-        if (name.equals("admin", ignoreCase = true) && password == "12345") {
-            showToast("Вход успешен как администратор")
-            clearFields()
-
-            val resultIntent = Intent().apply {
-                //putExtra("isUserLoggedIn", true)
-                putExtra("userName", name)
-                //putExtra("userEmail", null) // Email не нужен для администраторов
-                putExtra("isAdmin", true)
-            }
-            setResult(RESULT_OK, resultIntent)
-
-            // Переход в StartActivity
-            finish() // Завершаем активность
-            return
-
-        }
-
-
         userApi.getAllUsers().enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                if (response.isSuccessful) {
-                    val users = response.body() ?: emptyList()
-                    val validUser = users.find {
-                        it.name.equals(name, ignoreCase = true) && it.password == password
-                    }
-                    if (validUser != null) {
-                        showToast("Вход успешен")
-
-                        clearFields()
-
-                        val resultIntent = Intent().apply {
-                            //putExtra("isUserLoggedIn", true)
-                            putExtra("userName", validUser.name)
-                            putExtra("userEmail", validUser.email)
-                            putExtra("isAdmin", false) // Указываем, что это не администратор
-                        }
-                        setResult(RESULT_OK, resultIntent)
-
-                        // Переход в StartActivity
-
-                        finish() // Завершаем текущую активностьии
-                    } else {
-                        showToast("Неверный логин или пароль")
-                        binding.etPassReg.text.clear()
-                    }
-                } else {
+                if (!response.isSuccessful) {
                     showToast("Ошибка авторизации: ${response.message()}")
+                    return
+                }
+
+                val users = response.body() ?: emptyList()
+                val validUser = users.find { it.name.equals(name, ignoreCase = true) }
+
+                // Проверяем, существует ли пользователь и соответствует ли пароль
+                if (validUser != null && BCrypt.checkpw(password, validUser.password)) {
+                    showToast("Вход успешен")
+
+                    // Устанавливаем текущего пользователя и проверяем, является ли он администратором
+                    CurrentUser.user = validUser
+                    CurrentUser.isAdmin = (validUser.id == 1L || validUser.id == 2L)
+
+                    clearFields()
+
+                    val resultIntent = Intent().apply {
+                        putExtra("userName", validUser.name)
+                        putExtra("userEmail", validUser.email)
+                        putExtra("isAdmin", CurrentUser.isAdmin) // Передаем информацию о том, является ли пользователь администратором
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                    finish()
+                } else {
+                    showToast("Неверный логин или пароль")
+                    binding.etPassReg.text.clear()
                 }
             }
 
@@ -161,16 +163,6 @@ class RegAuthActivity : AppCompatActivity() {
                 showToast("Ошибка подключения: ${t.message}")
             }
         })
-    }
-
-    private fun navigateToStartActivity(name: String, email: String?, isAdmin: Boolean) {
-        val intent = Intent().apply {
-            putExtra("userName", name)
-            putExtra("userEmail", email)
-            putExtra("isAdmin", isAdmin) // Передаем isAdmin
-        }
-        setResult(RESULT_OK, intent)
-        finish() // Закрытие MainActivity и возвращение в StartActivity
     }
 
     private fun toggleSignInSignUp() {
@@ -202,46 +194,6 @@ class RegAuthActivity : AppCompatActivity() {
     private fun isEmailValid(email: String): Boolean {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
         return email.matches(emailPattern.toRegex())
-    }
-
-    private fun checkUserExistsByName(name: String, callback: (Boolean) -> Unit) {
-        userApi.getAllUsers().enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                if (response.isSuccessful) {
-                    val users = response.body() ?: emptyList()
-                    val exists = users.any { it.name.equals(name, ignoreCase = true) }
-                    callback(exists)
-                } else {
-                    Log.e("APIError", "Error checking user by name: ${response.message()}")
-                    callback(false)
-                }
-            }
-
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                Log.e("NetworkError", "Error checking user by name: ${t.message}")
-                callback(false)
-            }
-        })
-    }
-
-    private fun checkUserExistsByEmail(email: String, callback: (Boolean) -> Unit) {
-        userApi.getAllUsers().enqueue(object : Callback<List<User>> {
-            override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                if (response.isSuccessful) {
-                    val users = response.body() ?: emptyList()
-                    val exists = users.any { it.email.equals(email, ignoreCase = true) }
-                    callback(exists)
-                } else {
-                    Log.e("APIError", "Error checking user by email: ${response.message()}")
-                    callback(false)
-                }
-            }
-
-            override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                Log.e("NetworkError", "Error checking user by email: ${t.message}")
-                callback(false)
-            }
-        })
     }
 
     private fun showToast(message: String) {

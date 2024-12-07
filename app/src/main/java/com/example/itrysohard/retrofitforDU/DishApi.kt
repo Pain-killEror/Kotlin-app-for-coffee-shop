@@ -1,6 +1,6 @@
-package com.example.myappforcafee.retrofit
+package com.example.itrysohard.retrofitforDU
 
-import com.example.myappforcafee.model.DishServ
+import com.example.itrysohard.model.DishServ
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call

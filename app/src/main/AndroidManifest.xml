@@ -20,14 +20,25 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".justactivity.DishDetailActivity"
+            android:name=".justactivity.about_us.LeaveReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".justactivity.AddDishActivity"
+            android:name=".justactivity.about_us.ReviewDetailActivity"
             android:exported="false" />
-
         <activity
-            android:name=".justactivity.MenuActivity"
+            android:name=".justactivity.about_us.AboutUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.menu.cart.CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.menu.DishDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.menu.AddDishActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.menu.MenuActivity"
             android:exported="false" />
         <activity
             android:name=".justactivity.PersAccActivity"

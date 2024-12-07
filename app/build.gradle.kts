@@ -41,6 +41,13 @@ android {
 }
 
 dependencies {
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation ("androidx.appcompat:appcompat:1.5.1'")
+    implementation ("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation ("org.mindrot:jbcrypt:0.4")
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.places)
     // Room Database
 
     kapt("androidx.room:room-compiler:2.6.0")

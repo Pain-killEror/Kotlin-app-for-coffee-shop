@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     android:padding="16dp">
 
     <ImageView
@@ -11,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_margin="5dp"
 
-        android:src="@drawable/avatar" /> <!-- Замените на имя вашего изображения -->
+        android:src="@drawable/user_photo" /> <!-- Замените на имя вашего изображения -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,6 +23,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
+        android:textColor="@color/black"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="648dp"
         android:layout_toEndOf="@id/avatar"
@@ -31,19 +34,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="30sp"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/PersEmail"
             android:layout_width="180dp"
+            android:textColor="@color/black"
             android:layout_height="wrap_content"
             android:textSize="18sp" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="190dp"
+        android:layout_marginBottom="90dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/PersName" />
 
     <Button
         android:id="@+id/btLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:text="@string/btExitAcc"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"

@@ -7,17 +7,23 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.example.myappforcafee.retrofit.DishApi
-import com.example.myappforcafee.retrofit.RetrofitService
-import com.example.myappforcafee.model.DishServ
+import com.example.itrysohard.model.DishServ
+import com.example.itrysohard.retrofitforDU.DishApi
+import com.example.itrysohard.retrofitforDU.RetrofitService
+
 import retrofit2.Call
 import retrofit2.Callback
+
 import retrofit2.Response
 
 class MyApplication : Application() {
+    val cartItems = mutableListOf<DishServ>()
+    var cartItemCount: Int = 0
+    var selectedSizes = mutableMapOf<Int, String?>()
 
     override fun onCreate() {
         super.onCreate()
+
         // Очистить кэш в Glide при открытии приложения
         clearGlideCache()
 

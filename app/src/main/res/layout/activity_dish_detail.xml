@@ -1,91 +1,148 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9">
 
-    <!-- Изображение блюда -->
-    <ImageView
-        android:id="@+id/ivDishImage"
-        android:layout_marginTop="16dp"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Название блюда -->
     <TextView
         android:id="@+id/tvDishName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="28dp"
         android:text="Название блюда"
+        android:textColor="#333333"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#333333"
-        app:layout_constraintTop_toBottomOf="@id/ivDishImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Описание блюда -->
     <TextView
         android:id="@+id/tvDishDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
         android:text="Описание блюда. Это описание покажет, что входит в состав или какие особенности блюда."
-        android:textSize="16sp"
         android:textColor="#666666"
-        app:layout_constraintTop_toBottomOf="@id/tvDishName"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imgvDishPhoto" />
 
-    <!-- Цена блюда -->
     <TextView
         android:id="@+id/tvDishPrice"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Цена: 500 ₽"
+        android:textColor="#4CAF50"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#4CAF50"
-        app:layout_constraintTop_toBottomOf="@id/tvDishDescription"
+        app:layout_constraintBottom_toTopOf="@+id/btnAddToCart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.531"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDishDescription"
+        app:layout_constraintVertical_bias="0.956" />
 
-    <!-- Кнопка "Вернуться назад" -->
+    <ImageView
+        android:id="@+id/imgvDishPhoto"
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="44dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDishName"
+        app:srcCompat="@drawable/dish" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/tvDishPrice"
+        tools:layout_editor_absoluteX="0dp">
+
+        <Button
+            android:id="@+id/btnSizeS"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginRight="15dp"
+            android:backgroundTint="#707070"
+            android:text="S"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnSizeM"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:backgroundTint="#707070"
+            android:text="M"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnSizeL"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="15dp"
+            android:backgroundTint="#707070"
+            android:text="L"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/btnEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="72dp"
         android:backgroundTint="#FF5722"
         android:text="Изменить"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDishPrice" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="108dp"
+        android:layout_marginBottom="72dp"
         android:backgroundTint="#FF5722"
         android:text="Удалить"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDishPrice" />
+        app:layout_constraintHorizontal_bias="0.949"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnAddToCart"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:layout_marginBottom="72dp"
+        android:backgroundTint="#FF5722"
+        android:text="Добавить в корзину"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.923"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

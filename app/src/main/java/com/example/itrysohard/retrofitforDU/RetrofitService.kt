@@ -1,4 +1,4 @@
-package com.example.myappforcafee.retrofit
+package com.example.itrysohard.retrofitforDU
 
 import com.google.gson.Gson
 import retrofit2.Retrofit
@@ -17,4 +17,9 @@ class RetrofitService {
     fun getRetrofit(): Retrofit {
         return retrofit
     }
+
+    fun getUserApi(): UserApi {
+        return retrofit.create(UserApi::class.java)
+    }
+
 }

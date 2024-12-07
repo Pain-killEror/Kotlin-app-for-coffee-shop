@@ -1,4 +1,4 @@
-package com.example.itrysohard.justactivity
+package com.example.itrysohard.justactivity.menu
 
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -18,9 +18,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.databinding.ActivityAddDishBinding
-import com.example.myappforcafee.model.DishServ
-import com.example.myappforcafee.retrofit.DishApi
-import com.example.myappforcafee.retrofit.RetrofitService
+import com.example.itrysohard.model.DishServ
+import com.example.itrysohard.retrofitforDU.DishApi
+import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.squareup.picasso.Picasso
 import okhttp3.MultipartBody
 import retrofit2.Call
@@ -35,6 +35,7 @@ class AddDishActivity : AppCompatActivity() {
     private var selectedImageUri: Uri? = null
     private var selectedCategory: String? = null
     private var dishId: Int? = null // ID редактируемого блюда
+    private var isSaving = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,12 +89,18 @@ class AddDishActivity : AppCompatActivity() {
         }
 
         binding.btnChoosePhoto.setOnClickListener { openGallery() }
+         // Переменная для отслеживания состояния
+
         binding.btnSaveDish.setOnClickListener {
+            if (isSaving) return@setOnClickListener // Если уже сохраняем, ничего не делаем
+
+            isSaving = true // Устанавливаем, что процесс сохранения начался
+            binding.btnSaveDish.isEnabled = false // Отключаем кнопку
+
             if (dishId == null) {
-                saveDish() // Add new dish
+                saveDish() // Добавляем новое блюдо
             } else {
-                updateDish()
-                setResult(Activity.RESULT_OK)// Update existing dish
+                updateDish() // Обновляем существующее блюдо
             }
         }
     }
@@ -111,13 +118,8 @@ class AddDishActivity : AppCompatActivity() {
         // Загрузка изображения как Bitmap
         val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImageUri)
 
-
-
-
         val sizeBeforeCompression = bitmap.byteCount / 1024 // размер в КБ
         Log.d("MyLog", "Размер изображения до сжатия: $sizeBeforeCompression KB")
-
-
 
         // Сохранение Bitmap без метаданных
         val file = File(getExternalFilesDir(null), "image_${System.currentTimeMillis()}.jpg")
@@ -129,9 +131,6 @@ class AddDishActivity : AppCompatActivity() {
 
         val sizeAfterCompression = file.length() / 1024 // размер в КБ
         Log.d("MyLog", "Размер изображения после сжатия: $sizeAfterCompression KB")
-
-
-
 
 
         // Создание RequestBody для загрузки
@@ -151,19 +150,22 @@ class AddDishActivity : AppCompatActivity() {
 
         call.enqueue(object : Callback<DishServ> {
             override fun onResponse(call: Call<DishServ>, response: Response<DishServ>) {
+
+
                 if (response.isSuccessful) {
                     Toast.makeText(this@AddDishActivity, "Блюдо добавлено!", Toast.LENGTH_SHORT).show()
-                    val resultIntent = Intent().apply {
-                        putExtra("result_message", "OK")
-                    }
                     finish()
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Неизвестная ошибка"
                     Toast.makeText(this@AddDishActivity, "Ошибка: $errorMessage", Toast.LENGTH_SHORT).show()
                 }
+                isSaving = false // Сбрасываем состояние
+                binding.btnSaveDish.isEnabled = true // Включаем кнопку снова
             }
 
             override fun onFailure(call: Call<DishServ>, t: Throwable) {
+                isSaving = false // Сбрасываем состояние
+                binding.btnSaveDish.isEnabled = true // Включаем кнопку снова
                 Toast.makeText(this@AddDishActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

@@ -1,13 +1,14 @@
-package com.example.itrysohard.justactivity
+package com.example.itrysohard.justactivity.menu
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.R
-import com.example.myappforcafee.model.DishServ
+import com.example.itrysohard.model.DishServ
 import com.squareup.picasso.Picasso
 
 class DishAdapter(private val onDishClick: (DishServ) -> Unit) : RecyclerView.Adapter<DishAdapter.DishViewHolder>() {
@@ -38,7 +39,7 @@ class DishAdapter(private val onDishClick: (DishServ) -> Unit) : RecyclerView.Ad
         private val dishImage: ImageView = itemView.findViewById(R.id.ivDishImage)
         private val dishName: TextView = itemView.findViewById(R.id.tvDishName)
         private val dishPrice: TextView = itemView.findViewById(R.id.tvDishPrice)
-
+        private val btnCheck: ImageButton = itemView.findViewById(R.id.btnCheck)
         fun bind(dish: DishServ) {
             // Загружаем изображение с указанием желаемого размера
             Picasso.get()
@@ -51,7 +52,7 @@ class DishAdapter(private val onDishClick: (DishServ) -> Unit) : RecyclerView.Ad
             dishPrice.text = "${dish.price} руб."
 
             // Устанавливаем обработчик клика
-            itemView.setOnClickListener {
+            btnCheck.setOnClickListener {
                 onDishClick(dish)
             }
         }
