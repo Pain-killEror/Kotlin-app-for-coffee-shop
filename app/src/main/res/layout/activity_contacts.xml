@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="#B9B9BB"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".justactivity.MainPage.PagesOnMain.ContactsActivity">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:layout_marginTop="93dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+
+
+           <FrameLayout
+                android:id="@+id/wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:clipToPadding="false"
+                android:padding="12dp">
+
+
+            <LinearLayout
+                android:id="@+id/shadowLiner"
+                android:layout_width="322dp"
+                android:layout_height="166dp"
+                android:layout_gravity="center_horizontal|top"
+                android:background="@drawable/rounded_background_contacts"
+                android:elevation="0dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="72dp"
+                    android:layout_marginTop="17dp"
+                    android:fontFamily="@font/aclonicaregular"
+                    android:text="ЧАСЫ РАБОТЫ \n08:00-22:00   -\nбудни\n10:00-22:00    -\nвыходные"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp" />
+
+            </LinearLayout>
+           </FrameLayout>
+
+
+
+        <View
+            android:layout_width="82dp"
+            android:layout_height="82dp"
+            android:layout_gravity="top|start"
+            android:background="@drawable/circle_background_up_contacts"
+            android:elevation="8dp"
+            android:shadowColor="#AA000000"
+            android:shadowDx="0"
+            android:shadowDy="4"
+            android:shadowRadius="8"
+            android:translationX="20dp"
+            android:translationZ="4dp" />
+        <!-- Круглый элемент в верхнем левом углу -->
+
+
+    </FrameLayout>
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/oval_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp"
+        android:layout_marginBottom="10dp"
+        app:cardBackgroundColor="#650705"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Кнопки внутри овальной рамки -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:maxWidth="30dp"
+                android:maxHeight="30dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_home" />
+
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:maxWidth="30dp"
+                android:maxHeight="30dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_menu" />
+
+            <RelativeLayout
+                android:id="@+id/rlCart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/btnCart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:maxWidth="30dp"
+                    android:maxHeight="30dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/icon_shopping_bag" />
+
+                <TextView
+                    android:id="@+id/tvCartCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/btnCart"
+                    android:layout_marginStart="4dp"
+                    android:text="0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:visibility="visible" />
+            </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/btnPersAcc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:maxWidth="30dp"
+                android:maxHeight="30dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_user" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

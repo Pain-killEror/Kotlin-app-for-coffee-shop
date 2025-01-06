@@ -2,25 +2,24 @@ package com.example.itrysohard.justactivity.about_us
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.MyApplication
-import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityAboutUsBinding
-import com.example.itrysohard.justactivity.PersAccActivity
-import com.example.itrysohard.justactivity.RegAuthActivity
-import com.example.itrysohard.justactivity.StartActivity
+import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
+import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.model.CurrentUser
-import com.example.itrysohard.model.DishServ
+import com.example.itrysohard.model.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +45,6 @@ class AboutUsActivity : AppCompatActivity() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // Удаляем все предыдущие активности
             }
             startActivity(intent)
-
         }
 
         binding.recyclerViewReviews.adapter = reviewAdapter
@@ -83,6 +81,8 @@ class AboutUsActivity : AppCompatActivity() {
         }
         myApplication = application as MyApplication
         updateCartCountDisplay()
+
+
 
         binding.buttonLeaveReview.setOnClickListener {
            showAuthorizationDialog()
@@ -139,6 +139,12 @@ class AboutUsActivity : AppCompatActivity() {
         super.onResume()
         loadReviews()
         updateCartCountDisplay()
+
+        if (CurrentUser.isAdmin == true)
+            binding.buttonLeaveReview.visibility = View.GONE
+        if (CurrentUser.isBlocked == true)
+            binding.buttonLeaveReview.visibility = View.GONE
+
     }
     private fun updateCartCountDisplay() {
         binding.tvCartCount.text = myApplication.cartItemCount.toString()
@@ -148,7 +154,7 @@ class AboutUsActivity : AppCompatActivity() {
         reviewApi.getAllReviews().enqueue(object : Callback<List<Review>> {
             override fun onResponse(call: Call<List<Review>>, response: Response<List<Review>>) {
                 if (response.isSuccessful) {
-                    val reviews = response.body() ?: emptyList()
+                    val reviews = response.body()?.reversed() ?: emptyList()
                     reviewAdapter.setReviews(reviews)
 
                 } else {

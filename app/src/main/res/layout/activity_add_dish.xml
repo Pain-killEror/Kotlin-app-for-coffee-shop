@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".justactivity.menu.AddDishActivity"
     android:padding="16dp">
 
@@ -14,15 +15,18 @@
         <!-- Image Preview -->
         <ImageView
             android:id="@+id/ivDishPhoto"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_width="370dp"
+            android:layout_gravity="center"
+            android:layout_height="370dp"
+
             android:scaleType="centerCrop" />
 
         <!-- Button to Choose Photo -->
         <Button
             android:id="@+id/btnChoosePhoto"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:text="Выбрать фото" />
 
@@ -32,6 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Название блюда"
+            android:textColor="@color/black"
+            android:textColorHint="#717171"
             android:inputType="text"
             android:layout_marginTop="16dp" />
 
@@ -40,6 +46,8 @@
             android:id="@+id/etDishDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textColorHint="#717171"
             android:hint="Описание блюда"
             android:inputType="textMultiLine"
             android:minLines="3"
@@ -51,6 +59,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Цена блюда"
+            android:textColor="@color/black"
+            android:textColorHint="#717171"
             android:inputType="numberDecimal"
             android:layout_marginTop="8dp" />
 
@@ -58,16 +68,42 @@
         <Spinner
             android:id="@+id/spinnerDishCategory"
             android:layout_width="match_parent"
+            android:textColor="@android:color/black"
             android:layout_height="30dp"
-            android:layout_marginTop="50dp" />
+            android:layout_marginTop="30dp" />
 
-        <!-- Save Button -->
-        <Button
-            android:id="@+id/btnSaveDish"
+        <EditText
+            android:id="@+id/etDishDiscount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:text="Сохранить блюдо" />
+            android:hint="Скидка на блюдо"
+            android:textColor="@color/black"
+            android:textColorHint="#717171"
+            android:inputType="number"
+            android:layout_marginTop="15dp" />
+
+        <!-- Save Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginRight="40dp"
+                android:text="Удалить" />
+
+            <Button
+                android:id="@+id/btnSaveDish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Сохранить блюдо" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

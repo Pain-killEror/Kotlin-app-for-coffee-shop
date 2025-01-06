@@ -13,5 +13,6 @@ interface ReviewApi {
     fun addReview(@Body review: Review): Call<Review>
 
     @DELETE("/review/delete/{id}") // Путь к вашему API для удаления отзыва
-    fun deleteReview(@Path("id") id: Int): Call<Void>
+    fun deleteReview(@Path("id") id: Long?): Call<Void>
+
 }

@@ -15,19 +15,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.itrysohard.BackPress.ActivityHistoryImpl
+import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.MyApplication
 import com.example.itrysohard.databinding.ActivityMenuBinding
-import com.example.itrysohard.justactivity.PersAccActivity
-import com.example.itrysohard.justactivity.RegAuthActivity
-import com.example.itrysohard.justactivity.StartActivity
+import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
+import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MenuActivity : AppCompatActivity() {
 
@@ -39,19 +42,23 @@ class MenuActivity : AppCompatActivity() {
     private var cartCount = 0
     private var selectedButtonId: Int? = null
 
+
     companion object {
         private const val REQUEST_CODE_ADD_DISH = 101
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+
         // Настройка адаптеров
-        breakfastAdapter = DishAdapter { dish -> onDishSelected(dish) }
-        dessertAdapter = DishAdapter { dish -> onDishSelected(dish) }
-        drinkAdapter = DishAdapter { dish -> onDishSelected(dish) }
+        breakfastAdapter = DishAdapter(this) { dish -> onDishSelected(dish) }
+        dessertAdapter = DishAdapter(this) { dish -> onDishSelected(dish) }
+        drinkAdapter = DishAdapter(this) { dish -> onDishSelected(dish) }
 
         // Подключение RecyclerView
         setupRecyclerViews()
@@ -85,7 +92,13 @@ class MenuActivity : AppCompatActivity() {
         updateCartCountDisplay()
     }
 
-    private fun updateCartCountDisplay() {
+    override fun onBackPressed() {
+        BackPressManager.handleBackPress(this) {
+            super.onBackPressed()
+        }
+    }
+
+    fun updateCartCountDisplay() {
         binding.tvCartCount.text = myApplication.cartItemCount.toString()
     }
 
@@ -186,6 +199,7 @@ class MenuActivity : AppCompatActivity() {
 
         binding.btnMenu.setOnClickListener {
             Toast.makeText(this, "Вы уже в меню!", Toast.LENGTH_SHORT).show()
+            onResume()
         }
 
         binding.btnCart.setOnClickListener {
@@ -207,6 +221,7 @@ class MenuActivity : AppCompatActivity() {
                 // Перенаправление на LeaveReviewActivity
                 val intent = Intent(this, RegAuthActivity::class.java)
                 startActivity(intent)
+                finish()
             }
 
             builder.setNegativeButton("Отмена") { dialog, _ ->
@@ -219,34 +234,42 @@ class MenuActivity : AppCompatActivity() {
         else startActivity(Intent(this, PersAccActivity::class.java))
     }
 
-    private fun loadDishes() {
-        val retrofitService = RetrofitService()
-        val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
 
-        dishApi.getAllDishes().enqueue(object : Callback<List<DishServ>> {
-            override fun onResponse(call: Call<List<DishServ>>, response: Response<List<DishServ>>) {
+
+    private fun loadDishes() {
+        GlobalScope.launch(Dispatchers.Main) {
+            val retrofitService = RetrofitService()
+            val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
+
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    dishApi.getAllDishes().execute()
+                }
+
                 if (response.isSuccessful) {
                     response.body()?.let { dishes ->
                         val breakfasts = dishes.filter { it.category == "Завтрак" }
                         val desserts = dishes.filter { it.category == "Десерт" }
                         val drinks = dishes.filter { it.category == "Напиток" }
 
-                        breakfastAdapter.setDishes(breakfasts)
-                        dessertAdapter.setDishes(desserts)
-                        drinkAdapter.setDishes(drinks)
-                        updateCartCountDisplay()
+                        withContext(Dispatchers.Main) {
+                            breakfastAdapter.setDishes(breakfasts)
+                            dessertAdapter.setDishes(desserts)
+                            drinkAdapter.setDishes(drinks)
+                            updateCartCountDisplay()
+                        }
                     }
                 } else {
                     Toast.makeText(this@MenuActivity, "Ошибка загрузки меню: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@MenuActivity, StartActivity::class.java))
+                    finish()
                 }
-
-
+            } catch (e: Exception) {
+                Toast.makeText(this@MenuActivity, "Ошибка сети: ${e.message}", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@MenuActivity, StartActivity::class.java))
+                finish()
             }
-
-            override fun onFailure(call: Call<List<DishServ>>, t: Throwable) {
-                Toast.makeText(this@MenuActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        }
     }
 
     private fun onDishSelected(dish: DishServ) {
@@ -257,6 +280,7 @@ class MenuActivity : AppCompatActivity() {
         intent.putExtra("DISH_PRICE", dish.price)
         intent.putExtra("DISH_CATEGORY", dish.category)
         intent.putExtra("DISH_ID", dish.id)
+        intent.putExtra("DISH_DISCOUNT", dish.discount)
         Log.d("MyLog", "Dish ID: ${dish.id}")
         startActivity(intent)
     }
@@ -274,10 +298,24 @@ class MenuActivity : AppCompatActivity() {
         // Обновите количество в корзине, если необходимо
     }
 
+
     override fun onResume() {
         super.onResume()
+        val isAdmin = CurrentUser.isAdmin
+        // Обновите адаптеры
+        breakfastAdapter.updateAdminStatus(isAdmin)
+        dessertAdapter.updateAdminStatus(isAdmin)
+        drinkAdapter.updateAdminStatus(isAdmin)
+        // Перезагрузите данные
         loadDishes()
         cartCount = (application as MyApplication).cartItems.size
         updateCartCount(cartCount)
+        binding.btnAddDish.visibility = if (isAdmin) View.VISIBLE else View.GONE
+        breakfastAdapter.refresh()
+        dessertAdapter.refresh()
+        drinkAdapter.refresh()
+
     }
+
+    
 }

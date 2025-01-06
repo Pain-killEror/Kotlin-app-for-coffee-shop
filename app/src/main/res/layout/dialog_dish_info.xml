@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_gravity="center_vertical|center_horizontal"
+    android:layout_marginBottom="70dp"
+    android:layout_marginRight="90dp"
+    android:layout_marginLeft="90dp"
+    android:padding="8dp"
+    android:background="@drawable/rounded_info_dialog">
+
+
+    <TextView
+        android:id="@+id/tvDishName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Название блюда"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Описание"
+        android:textSize="16sp"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Закрыть"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
+</LinearLayout>

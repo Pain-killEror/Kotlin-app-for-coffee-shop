@@ -13,7 +13,7 @@ class RetrofitService {
             .addConverterFactory(GsonConverterFactory.create(Gson()))
             .build()
     }
-
+    
     fun getRetrofit(): Retrofit {
         return retrofit
     }

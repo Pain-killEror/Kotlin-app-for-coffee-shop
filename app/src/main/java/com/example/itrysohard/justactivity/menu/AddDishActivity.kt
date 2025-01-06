@@ -16,8 +16,12 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.databinding.ActivityAddDishBinding
+import com.example.itrysohard.justactivity.MainPage.StartActivity
+import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
@@ -36,60 +40,41 @@ class AddDishActivity : AppCompatActivity() {
     private var selectedCategory: String? = null
     private var dishId: Int? = null // ID редактируемого блюда
     private var isSaving = false
+    private lateinit var dishApi: DishApi
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityAddDishBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val categories = arrayOf("Завтрак", "Десерт", "Напиток")
-        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val textView = view as TextView
-                textView.textSize = 20f
-                return view
-            }
+        setupSpinner() // Настройка Spinner
 
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                textView.textSize = 20f
-                return view
-            }
-        }
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerDishCategory.adapter = adapter
-
-        binding.spinnerDishCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedCategory = categories[position]
-            }
-
-            override fun onNothingSelected(parentView: AdapterView<*>?) {
-                selectedCategory = null
-            }
-        }
-
-        // Load existing dish data if editing
+        // Загрузка данных существующего блюда, если редактирование
         val intent = intent
         if (intent.hasExtra("dish_id")) {
             dishId = intent.getIntExtra("dish_id", -1)
             binding.etDishName.setText(intent.getStringExtra("dish_name"))
             binding.etDishDescription.setText(intent.getStringExtra("dish_description"))
             binding.etDishPrice.setText(intent.getDoubleExtra("dish_price", 0.0).toString())
-            binding.spinnerDishCategory.setSelection(categories.indexOf(selectedCategory))
+            selectedCategory = intent.getStringExtra("dish_category")
+            binding.etDishDiscount.setText(intent.getIntExtra("dish_discount", 0).toString())
 
             val imageUri = intent.getStringExtra("dish_image_uri")
-            Log.d("MyLog", "Yes: $selectedImageUri")
             if (!imageUri.isNullOrEmpty()) {
                 Picasso.get().load(imageUri).into(binding.ivDishPhoto)
-                Log.d("MyLog", "Loaded existing image URI: $selectedImageUri")
             }
         }
 
         binding.btnChoosePhoto.setOnClickListener { openGallery() }
-         // Переменная для отслеживания состояния
+
+        if (dishId == null) binding.btnDelete.visibility = View.GONE
+        else binding.btnDelete.visibility = View.VISIBLE
+
+        binding.btnDelete.setOnClickListener{
+            showDeleteConfirmationDialog()
+        }
 
         binding.btnSaveDish.setOnClickListener {
             if (isSaving) return@setOnClickListener // Если уже сохраняем, ничего не делаем
@@ -98,9 +83,11 @@ class AddDishActivity : AppCompatActivity() {
             binding.btnSaveDish.isEnabled = false // Отключаем кнопку
 
             if (dishId == null) {
-                saveDish() // Добавляем новое блюдо
+                saveDish()// Добавляем новое блюдо
+
             } else {
-                updateDish() // Обновляем существующее блюдо
+                updateDish()// Обновляем существующее блюдо
+
             }
         }
     }
@@ -109,6 +96,7 @@ class AddDishActivity : AppCompatActivity() {
         val name = binding.etDishName.text.toString()
         val description = binding.etDishDescription.text.toString()
         val price = binding.etDishPrice.text.toString().toDoubleOrNull()
+        val discount = binding.etDishDiscount.text.toString().toIntOrNull() ?: 0
 
         if (name.isEmpty() || description.isEmpty() || price == null || selectedImageUri == null || selectedCategory == null) {
             Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
@@ -145,7 +133,8 @@ class AddDishActivity : AppCompatActivity() {
             description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
             price = price.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
             category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
-            image = imagePart
+            image = imagePart,
+            discount = discount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         )
 
         call.enqueue(object : Callback<DishServ> {
@@ -175,6 +164,7 @@ class AddDishActivity : AppCompatActivity() {
         val name = binding.etDishName.text.toString()
         val description = binding.etDishDescription.text.toString()
         val price = binding.etDishPrice.text.toString().toDoubleOrNull()
+        val discount = binding.etDishDiscount.text.toString().toIntOrNull() ?: 0
 
         if (name.isEmpty() || description.isEmpty() || price == null || selectedCategory == null) {
             Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
@@ -206,13 +196,16 @@ class AddDishActivity : AppCompatActivity() {
             description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
             price = price.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
             category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
-            image = imagePart
+            image = imagePart,
+            discount = discount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         )
 
         call.enqueue(object : Callback<DishServ> {
             override fun onResponse(call: Call<DishServ>, response: Response<DishServ>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@AddDishActivity, "Блюдо обновлено!", Toast.LENGTH_SHORT).show()
+                    Thread.sleep(100)
+                    finish()
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Неизвестная ошибка"
                     Toast.makeText(this@AddDishActivity, "Ошибка: $errorMessage", Toast.LENGTH_SHORT).show()
@@ -224,7 +217,38 @@ class AddDishActivity : AppCompatActivity() {
             }
         })
 
-        finish()
+
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        Toast.makeText(this@AddDishActivity, "dishId=${dishId!!}", Toast.LENGTH_SHORT).show()
+        AlertDialog.Builder(this@AddDishActivity)
+            .setTitle("Подтверждение")
+            .setMessage("Вы уверены, что хотите БЕЗВОЗВРАТНО удалить это блюдо?")
+            .setPositiveButton("Да") { _, _ ->
+                deleteDish()
+            }
+            .setNegativeButton("Нет", null)
+            .show()
+    }
+
+    private fun deleteDish(){
+        val retrofitService = RetrofitService()
+        val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
+        dishApi.deleteDish(dishId!!).enqueue(object: Callback<Void>{
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@AddDishActivity, "Блюдо успешно удалено", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                else Toast.makeText(this@AddDishActivity, "Что-то пошло не так!", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(this@AddDishActivity, "Ошибак сети", Toast.LENGTH_SHORT).show()
+            }
+        })
+
     }
 
     private fun openGallery() {
@@ -241,18 +265,41 @@ class AddDishActivity : AppCompatActivity() {
         }
     }
 
-    private fun getRealPathFromURI(uri: Uri): String {
-        var path = ""
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        if (cursor != null) {
-            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            path = cursor.getString(columnIndex)
-            cursor.close()
+    private fun setupSpinner() {
+        val categories = arrayOf("Завтрак", "Десерт", "Напиток")
+        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.textSize = 20f
+                view.setTextColor(resources.getColor(android.R.color.black)) // Установка цвета текста
+                view.setBackgroundColor(resources.getColor(android.R.color.white)) // Установка цвета фона
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                view.textSize = 20f
+                view.setTextColor(resources.getColor(android.R.color.black)) // Установка цвета текста
+                view.setBackgroundColor(resources.getColor(android.R.color.white)) // Установка цвета фона
+                return view
+            }
         }
-        return path
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerDishCategory.adapter = adapter
+
+        binding.spinnerDishCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedCategory = categories[position]
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+                selectedCategory = null
+            }
+        }
     }
+
+
 
     companion object {
         private const val REQUEST_CODE_SELECT_IMAGE = 101

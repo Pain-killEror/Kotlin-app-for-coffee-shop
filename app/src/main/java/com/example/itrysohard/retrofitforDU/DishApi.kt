@@ -18,7 +18,8 @@ interface DishApi {
         @Part("description") description: RequestBody,
         @Part("price") price: RequestBody,
         @Part image: MultipartBody.Part,
-        @Part ("category") category: RequestBody
+        @Part ("category") category: RequestBody,
+        @Part ("discount") discount: RequestBody
     ): Call<DishServ>
 
     @DELETE("/dish/delete/{id}")
@@ -32,6 +33,7 @@ interface DishApi {
         @Part("description") description: RequestBody,
         @Part("price") price: RequestBody,
         @Part("category") category: RequestBody,
-        @Part image: MultipartBody.Part? // image is optional
+        @Part image: MultipartBody.Part?,
+        @Part ("discount") discount: RequestBody
     ): Call<DishServ>
 }

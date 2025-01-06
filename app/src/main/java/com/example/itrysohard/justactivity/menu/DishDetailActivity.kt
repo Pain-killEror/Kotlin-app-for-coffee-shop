@@ -15,11 +15,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.example.itrysohard.MyApplication
-import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityDishDetailBinding
-import com.example.itrysohard.justactivity.RegAuthActivity
+import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
@@ -51,6 +49,7 @@ class DishDetailActivity : AppCompatActivity() {
         val price = intent.getDoubleExtra("DISH_PRICE", 0.0)
         val dishId = intent.getIntExtra("DISH_ID", -1)
         val category = intent.getStringExtra("DISH_CATEGORY") ?: "Неизвестная категория"
+        val discount = intent.getIntExtra("DISH_DISCOUNT", 0)
 
         if (category != "Напиток") {
             binding.linearLayout.visibility = View.GONE // Скрываем LinearLayout с кнопками
@@ -59,15 +58,15 @@ class DishDetailActivity : AppCompatActivity() {
         if (!imageUri.isNullOrEmpty()) {
             Picasso.get()
                 .load(imageUri)
-                .resize(1000, 1000) // Укажите желаемый размер
-                .centerCrop()
+                .resize(5000, 5000) // Укажите желаемый размер
+                //.centerCrop()
                 .into(binding.imgvDishPhoto) // Убедитесь, что у вас есть imgvDishPhoto в layout
         }
         // Устанавливаем данные в UI
         binding.tvDishName.text = name
 
         binding.tvDishDescription.text = description
-        binding.tvDishPrice.text = "$price руб."
+        binding.tvDishPrice.text = "$price р."
 
         // Настраиваем видимость кнопок для администратора
         val isAdmin = CurrentUser.isAdmin
@@ -76,13 +75,13 @@ class DishDetailActivity : AppCompatActivity() {
         binding.btnAddToCart.visibility = if (isAdmin) View.GONE else View.VISIBLE
 
         // Обработчики для кнопок
-        setupButtons(dishId, name, description, price, imageUri, category)
+        setupButtons(dishId, name, description, price, imageUri, category, discount)
 
         // Настраиваем кнопки размеров
         setupSizeButtons()
     }
 
-    private fun setupButtons(dishId: Int, name: String, description: String, price: Double, imageUri: String?, category: String) {
+    private fun setupButtons(dishId: Int, name: String, description: String, price: Double, imageUri: String?, category: String, discount: Int) {
         binding.btnDelete.setOnClickListener {
             if (dishId != -1) {
                 deleteDish(dishId)
@@ -99,6 +98,7 @@ class DishDetailActivity : AppCompatActivity() {
                     putExtra("dish_description", description)
                     putExtra("dish_price", price)
                     putExtra("dish_image_uri", imageUri)
+                    putExtra("dish_discount", discount)
                 }
                 startActivity(intent)
                 finish()
@@ -114,7 +114,8 @@ class DishDetailActivity : AppCompatActivity() {
                 description = description,
                 price = price,
                 imageUrl = imageUri,
-                category = category
+                category = category,
+                discount = discount
             )
             addToCart(dishToAdd)
         }

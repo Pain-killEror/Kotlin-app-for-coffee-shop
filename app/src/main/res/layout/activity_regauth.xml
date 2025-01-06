@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:background="@color/white"
@@ -26,28 +27,40 @@
         android:layout_width="300dp"
         android:layout_height="60dp"
         android:textColor="@color/black"
+        android:textColorHint="#717171"
         android:hint="@string/etName_Reg"
         app:layout_constraintTop_toBottomOf="@+id/tvReg"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginLeft="60dp"
         android:layout_marginTop="16dp" />
 
     <EditText
         android:id="@+id/edEmailReg"
         android:layout_width="300dp"
         android:layout_height="60dp"
+        android:textColorHint="#717171"
         android:hint="@string/etEmail_Reg"
         android:inputType="textEmailAddress"
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@+id/etNameReg"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginLeft="60dp"
         android:layout_marginTop="16dp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edEmailReg">
 
     <EditText
         android:id="@+id/etPassReg"
         android:layout_width="300dp"
         android:layout_height="60dp"
+        android:textColorHint="#717171"
         android:hint="@string/etPass_Reg"
         android:inputType="textPassword"
         android:textColor="@color/black"
@@ -56,17 +69,82 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
+        <ImageButton
+            android:id="@+id/showPasswordButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="29dp"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Показать пароль"
+            android:maxWidth="30dp"
+            android:maxHeight="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_plus"
+            tools:layout_editor_absoluteX="334dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
+
+        <EditText
+            android:id="@+id/etPassRegSec"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:hint="@string/etPassReg2"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:textColorHint="#717171"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etPassReg" />
+
+        <ImageButton
+            android:id="@+id/showPasswordButtonSec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="29dp"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Показать пароль"
+            android:maxWidth="30dp"
+            android:maxHeight="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_plus"
+            tools:layout_editor_absoluteX="334dp" />
+
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/rememberMeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:text="Запомнить меня"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <Button
         android:id="@+id/btReg"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-
         android:text="@string/btReg"
         android:textSize="17sp"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPassReg" />
+        app:layout_constraintTop_toBottomOf="@+id/rememberMeCheckBox" />
 
     <TextView
         android:id="@+id/tvLinkSingInOnReg"
@@ -79,4 +157,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

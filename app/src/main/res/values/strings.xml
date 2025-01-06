@@ -6,6 +6,7 @@
     <string name="etName_Reg">Введите имя</string>
     <string name="etEmail_Reg">Введите email</string>
     <string name="etPass_Reg">Введите пароль</string>
+    <string name="etPassReg2">Повторите пароль</string>
     <string name="btReg">Зарегистрироваться</string>
     <string name="tvAuth">Войти</string>
     <string name="tvLinkSingIn_onReg">Уже есть аккаунт? Войти</string>
@@ -32,5 +33,6 @@
 
 
     <string name='cart'></string>
+
 
 </resources>

@@ -1,6 +1,5 @@
 package com.example.itrysohard.justactivity.about_us
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -8,12 +7,10 @@ import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.itrysohard.BackPress.ActivityHistoryImpl
+import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityLeaveReviewBinding
-import com.example.itrysohard.justactivity.PersAccActivity
-import com.example.itrysohard.justactivity.StartActivity
-import com.example.itrysohard.justactivity.menu.cart.CartActivity
-import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
@@ -33,6 +30,7 @@ class LeaveReviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityLeaveReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -49,6 +47,12 @@ class LeaveReviewActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onBackPressed() {
+        BackPressManager.handleBackPress(this) {
+            super.onBackPressed()
+        }
     }
 
     private fun submitReview() {
@@ -81,7 +85,7 @@ class LeaveReviewActivity : AppCompatActivity() {
                     finish() // Закрываем активность после успешной отправки
                 } else {
                     val errorMessage = when (response.code()) {
-                        500 -> "Ошибка: пользователь не может оставить более 2 отзывов в год."
+                        500 -> "Ошибка: пользователь не может оставить более 1 отзыва в месяц."
                         else -> response.errorBody()?.string() ?: "Неизвестная ошибка"
                     }
                     Toast.makeText(this@LeaveReviewActivity, errorMessage, Toast.LENGTH_SHORT).show()

@@ -1,11 +1,20 @@
 package com.example.itrysohard.justactivity.menu.cart
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.itrysohard.BackPress.ActivityHistoryImpl
+import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.MyApplication
 import com.example.itrysohard.databinding.ActivityCartBinding
+import com.example.itrysohard.justactivity.MainPage.StartActivity
+import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
+import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.justactivity.menu.MenuActivity
+import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 
 class CartActivity : AppCompatActivity() {
@@ -18,6 +27,7 @@ class CartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -33,8 +43,67 @@ class CartActivity : AppCompatActivity() {
         updateTotalPrice()
 
         binding.btnCheckout.setOnClickListener {
-            Toast.makeText(this, "Заказ оформлен!", Toast.LENGTH_SHORT).show()
+            clearCart()
+            Toast.makeText(this, "Покупка успешно совершена!", Toast.LENGTH_SHORT).show()
         }
+
+        binding.btnHome.setOnClickListener {
+            startActivity(Intent(this, StartActivity::class.java))
+            finish()
+        }
+
+        binding.btnMenu.setOnClickListener {
+            startActivity(Intent(this, MenuActivity::class.java))
+            finish()
+        }
+
+        binding.btnCart.setOnClickListener {
+            Toast.makeText(this, "Вы на экране корзины!", Toast.LENGTH_SHORT).show()
+
+        }
+
+        binding.btnPersAcc.setOnClickListener {
+            showAuthorizationDialogPers()
+        }
+
+    }
+
+    override fun onBackPressed() {
+        BackPressManager.handleBackPress(this) {
+            super.onBackPressed()
+        }
+    }
+
+    private fun showAuthorizationDialogPers() {
+        if (CurrentUser.user == null) {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Необходимо авторизоваться")
+            builder.setMessage("Вы не авторизованы. Пожалуйста, авторизуйтесь чтобы получить доступ к личному кабинету.")
+
+            builder.setPositiveButton("Аторизоваться") { _, _ ->
+                // Перенаправление на LeaveReviewActivity
+                val intent = Intent(this, RegAuthActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+
+            builder.setNegativeButton("Отмена") { dialog, _ ->
+                dialog.dismiss() // Закрываем диалог
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+        else startActivity(Intent(this, PersAccActivity::class.java))
+        finish()
+    }
+
+    private fun clearCart() {
+        cartItems.clear() // Очищаем список корзины
+        myApplication.cartItemCount = 0 // Сбрасываем счетчик товаров в корзине
+        selectedSizes.clear() // Очищаем выбранные размеры
+        cartAdapter.setDishes(cartItems) // Обновляем адаптер
+        updateTotalPrice() // Обновляем итоговую стоимость
     }
 
     private fun setupRecyclerView() {
@@ -58,7 +127,9 @@ class CartActivity : AppCompatActivity() {
         if (cartItems.isEmpty()) {
             binding.tvTotalPrice.text = "Корзина пуста"
         } else {
-            val totalPrice = cartItems.sumOf { it.price }
+            val totalPrice = cartItems.sumOf {
+                if (it.discount <= 0) it.price else it.price * (1 - it.discount / 100.0)
+            }
             binding.tvTotalPrice.text = "Итоговая стоимость: $totalPrice руб."
         }
     }

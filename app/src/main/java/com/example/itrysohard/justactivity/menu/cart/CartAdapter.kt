@@ -39,6 +39,29 @@ class CartAdapter(
         fun bind(dish: DishServ, size: String?) {
             binding.tvDishName.text = dish.name
             binding.tvDishPrice.text = "${dish.price} руб."
+            binding.tvDishDiscount.text = "${dish.discount} %"
+
+            val discountAmount = dish.price * (dish.discount / 100.0)
+
+            // Рассчитываем итоговую сумму
+            val finalPrice = dish.price - discountAmount
+
+
+            if(dish.discount <= 0){
+                val params = binding.tvDishPrice.layoutParams as ViewGroup.MarginLayoutParams
+                binding.tvDishDiscount.visibility = View.GONE
+                params.bottomMargin = 20
+                binding.tvDishPrice.layoutParams = params
+                binding.tvDishPrice.text = "${dish.price} р."
+            }
+            else{
+                binding.tvDishDiscount.visibility = View.VISIBLE
+                val params =  binding.tvDishPrice.layoutParams as ViewGroup.MarginLayoutParams
+                params.bottomMargin = 0
+                binding.tvDishPrice.layoutParams = params
+
+                binding.tvDishPrice.text = "${finalPrice} р."
+            }
 
             // Показываем размер только если он не null
             if (size != "Не выбран") {

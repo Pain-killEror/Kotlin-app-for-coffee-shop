@@ -9,7 +9,8 @@ data class DishServ(
     var description: String,
     var price: Double,
     var imageUrl: String?,
-    var category: String
+    var category: String,
+    var discount: Int
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -18,7 +19,8 @@ data class DishServ(
         description = parcel.readString() ?: "", // считываем description
         price = parcel.readDouble(),
         imageUrl = parcel.readString(),
-        category = parcel.readString() ?: "" // считываем category
+        category = parcel.readString() ?: "", // считываем category
+        discount = parcel.readInt()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -28,6 +30,7 @@ data class DishServ(
         parcel.writeDouble(price)
         parcel.writeString(imageUrl)
         parcel.writeString(category) // записываем category
+        parcel.writeInt(discount)
     }
 
     override fun describeContents(): Int {
@@ -45,6 +48,6 @@ data class DishServ(
     }
 
     override fun toString(): String {
-        return "DishServ(id=$id, name='$name', price=$price, imageUrl=$imageUrl, category='$category')"
+        return "DishServ(id=$id, name='$name', price=$price, imageUrl=$imageUrl, category='$category'), discount=$discount"
     }
 }

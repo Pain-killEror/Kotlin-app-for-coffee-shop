@@ -20,6 +20,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".justactivity.MainPage.PagesOnMain.ContactsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.MainPage.PagesOnMain.EventsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".justactivity.MainPage.PagesOnMain.MyAchievementsActivity"
+            android:exported="false" />
+        <activity
             android:name=".justactivity.about_us.LeaveReviewActivity"
             android:exported="false" />
         <activity
@@ -41,10 +50,10 @@
             android:name=".justactivity.menu.MenuActivity"
             android:exported="false" />
         <activity
-            android:name=".justactivity.PersAccActivity"
+            android:name=".justactivity.PersonalPage.PersAccActivity"
             android:exported="false" />
         <activity
-            android:name=".justactivity.StartActivity"
+            android:name=".justactivity.MainPage.StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,7 +62,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".justactivity.RegAuthActivity"
+            android:name=".justactivity.RegistrationAuthentication.RegAuthActivity"
             android:exported="true" />
     </application>
 
