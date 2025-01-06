@@ -22,6 +22,7 @@ import com.example.itrysohard.justactivity.RegAuthActivity
 import com.example.itrysohard.justactivity.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.model.CurrentUser.isAdmin
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
@@ -238,6 +239,8 @@ class MenuActivity : AppCompatActivity() {
                     }
                 } else {
                     Toast.makeText(this@MenuActivity, "Ошибка загрузки меню: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@MenuActivity, StartActivity::class.java))
+                    finish()
                 }
 
 
@@ -245,6 +248,8 @@ class MenuActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<List<DishServ>>, t: Throwable) {
                 Toast.makeText(this@MenuActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@MenuActivity, StartActivity::class.java))
+                finish()
             }
         })
     }
@@ -279,5 +284,6 @@ class MenuActivity : AppCompatActivity() {
         loadDishes()
         cartCount = (application as MyApplication).cartItems.size
         updateCartCount(cartCount)
+        binding.btnAddDish.visibility = if (isAdmin) View.VISIBLE else View.GONE
     }
 }

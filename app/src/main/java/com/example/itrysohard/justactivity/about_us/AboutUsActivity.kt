@@ -2,6 +2,7 @@ package com.example.itrysohard.justactivity.about_us
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -84,6 +85,8 @@ class AboutUsActivity : AppCompatActivity() {
         myApplication = application as MyApplication
         updateCartCountDisplay()
 
+
+
         binding.buttonLeaveReview.setOnClickListener {
            showAuthorizationDialog()
 
@@ -139,6 +142,8 @@ class AboutUsActivity : AppCompatActivity() {
         super.onResume()
         loadReviews()
         updateCartCountDisplay()
+        if (CurrentUser.isAdmin == true)
+            binding.buttonLeaveReview.visibility = View.GONE
     }
     private fun updateCartCountDisplay() {
         binding.tvCartCount.text = myApplication.cartItemCount.toString()

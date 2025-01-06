@@ -42,54 +42,24 @@ class AddDishActivity : AppCompatActivity() {
         binding = ActivityAddDishBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val categories = arrayOf("Завтрак", "Десерт", "Напиток")
-        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val textView = view as TextView
-                textView.textSize = 20f
-                return view
-            }
+        setupSpinner() // Настройка Spinner
 
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                textView.textSize = 20f
-                return view
-            }
-        }
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerDishCategory.adapter = adapter
-
-        binding.spinnerDishCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedCategory = categories[position]
-            }
-
-            override fun onNothingSelected(parentView: AdapterView<*>?) {
-                selectedCategory = null
-            }
-        }
-
-        // Load existing dish data if editing
+        // Загрузка данных существующего блюда, если редактирование
         val intent = intent
         if (intent.hasExtra("dish_id")) {
             dishId = intent.getIntExtra("dish_id", -1)
             binding.etDishName.setText(intent.getStringExtra("dish_name"))
             binding.etDishDescription.setText(intent.getStringExtra("dish_description"))
             binding.etDishPrice.setText(intent.getDoubleExtra("dish_price", 0.0).toString())
-            binding.spinnerDishCategory.setSelection(categories.indexOf(selectedCategory))
+            selectedCategory = intent.getStringExtra("dish_category")
 
             val imageUri = intent.getStringExtra("dish_image_uri")
-            Log.d("MyLog", "Yes: $selectedImageUri")
             if (!imageUri.isNullOrEmpty()) {
                 Picasso.get().load(imageUri).into(binding.ivDishPhoto)
-                Log.d("MyLog", "Loaded existing image URI: $selectedImageUri")
             }
         }
 
         binding.btnChoosePhoto.setOnClickListener { openGallery() }
-         // Переменная для отслеживания состояния
 
         binding.btnSaveDish.setOnClickListener {
             if (isSaving) return@setOnClickListener // Если уже сохраняем, ничего не делаем
@@ -241,18 +211,41 @@ class AddDishActivity : AppCompatActivity() {
         }
     }
 
-    private fun getRealPathFromURI(uri: Uri): String {
-        var path = ""
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        if (cursor != null) {
-            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            path = cursor.getString(columnIndex)
-            cursor.close()
+    private fun setupSpinner() {
+        val categories = arrayOf("Завтрак", "Десерт", "Напиток")
+        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.textSize = 20f
+                view.setTextColor(resources.getColor(android.R.color.black)) // Установка цвета текста
+                view.setBackgroundColor(resources.getColor(android.R.color.white)) // Установка цвета фона
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                view.textSize = 20f
+                view.setTextColor(resources.getColor(android.R.color.black)) // Установка цвета текста
+                view.setBackgroundColor(resources.getColor(android.R.color.white)) // Установка цвета фона
+                return view
+            }
         }
-        return path
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerDishCategory.adapter = adapter
+
+        binding.spinnerDishCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedCategory = categories[position]
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>?) {
+                selectedCategory = null
+            }
+        }
     }
+
+
 
     companion object {
         private const val REQUEST_CODE_SELECT_IMAGE = 101

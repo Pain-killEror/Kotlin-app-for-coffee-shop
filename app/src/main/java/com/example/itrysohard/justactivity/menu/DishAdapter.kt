@@ -44,9 +44,9 @@ class DishAdapter(private val onDishClick: (DishServ) -> Unit) : RecyclerView.Ad
             // Загружаем изображение с указанием желаемого размера
             Picasso.get()
                 .load(dish.imageUrl)
-                .resize(500, 500) // Укажите желаемый размер
-                .centerCrop() // Обеспечивает обрезку изображения для соответствия размеру
-                .into(dishImage)
+                .resize(500, 500) // Укажите размер, который вам нужен
+                .centerInside() // Сохраняет пропорции и добавляет прозрачные области, если необходимо
+                .into(dishImage);
 
             dishName.text = dish.name
             dishPrice.text = "${dish.price} руб."

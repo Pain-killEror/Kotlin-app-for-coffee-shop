@@ -56,26 +56,26 @@ class RegAuthActivity : AppCompatActivity() {
 
         if (!isEmailValid(email)) {
             showToast("Введите корректный адрес электронной почты")
+            binding.edEmailReg.text.clear()
             return
         }
 
         // Проверка существования пользователя
         userApi.getAllUsers().enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
-                if (!response.isSuccessful) {
-                    showToast("Ошибка проверки пользователей: ${response.message()}")
-                    return
-                }
+
 
                 val users = response.body() ?: emptyList()
 
                 // Проверяем, есть ли пользователь с таким именем или почтой
                 if (users.any { it.name.equals(name, ignoreCase = true) }) {
                     showToast("Имя уже занято")
+                    binding.etNameReg.text.clear()
                     return
                 }
                 if (users.any { it.email.equals(email, ignoreCase = true) }) {
                     showToast("Пользователь с такой почтой уже существует")
+                    binding.edEmailReg.text.clear()
                     return
                 }
 
@@ -89,10 +89,10 @@ class RegAuthActivity : AppCompatActivity() {
                             // Проверяем ID: если это 1 или 2, назначаем администратором
                             CurrentUser.isAdmin = (savedUser.id == 1L || savedUser.id == 2L)
 
-                            showToast("Регистрация успешна")
+                            //showToast("Регистрация успешна")
                             CurrentUser.user = savedUser
                             clearFields()
-
+                            showToast("Регистрация успешна")
                             val resultIntent = Intent().apply {
                                 putExtra("userName", savedUser.name)
                                 putExtra("userEmail", savedUser.email)
@@ -156,6 +156,7 @@ class RegAuthActivity : AppCompatActivity() {
                 } else {
                     showToast("Неверный логин или пароль")
                     binding.etPassReg.text.clear()
+                    binding.etNameReg.text.clear()
                 }
             }
 

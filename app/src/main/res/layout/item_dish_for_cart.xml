@@ -6,8 +6,8 @@
     android:layout_marginLeft="50dp"
     android:layout_marginTop="10dp"
     android:layout_marginRight="50dp"
-    android:background="@color/white"
-    android:backgroundTint="#d8cebb"
+
+    android:backgroundTint="#FFFFFF"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 

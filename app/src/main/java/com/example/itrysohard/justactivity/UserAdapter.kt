@@ -1,4 +1,4 @@
-package com.example.itrysohard.justactivity.menu
+package com.example.itrysohard.justactivity
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,10 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.R
 import com.example.itrysohard.model.User
-import com.example.itrysohard.retrofitforDU.UserApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class UserAdapter(
     private val context: Context,

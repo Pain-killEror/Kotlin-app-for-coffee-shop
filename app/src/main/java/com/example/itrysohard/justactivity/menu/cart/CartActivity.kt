@@ -33,8 +33,18 @@ class CartActivity : AppCompatActivity() {
         updateTotalPrice()
 
         binding.btnCheckout.setOnClickListener {
-            Toast.makeText(this, "Заказ оформлен!", Toast.LENGTH_SHORT).show()
+            clearCart()
+            Toast.makeText(this, "Покупка успешно совершена!", Toast.LENGTH_SHORT).show()
         }
+
+    }
+
+    private fun clearCart() {
+        cartItems.clear() // Очищаем список корзины
+        myApplication.cartItemCount = 0 // Сбрасываем счетчик товаров в корзине
+        selectedSizes.clear() // Очищаем выбранные размеры
+        cartAdapter.setDishes(cartItems) // Обновляем адаптер
+        updateTotalPrice() // Обновляем итоговую стоимость
     }
 
     private fun setupRecyclerView() {

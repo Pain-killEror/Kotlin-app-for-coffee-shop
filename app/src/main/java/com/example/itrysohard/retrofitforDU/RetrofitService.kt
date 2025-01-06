@@ -9,11 +9,11 @@ class RetrofitService {
 
     init {
         retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.0.154:8080/")
+            .baseUrl("http://192.168.123.120:8080/")
             .addConverterFactory(GsonConverterFactory.create(Gson()))
             .build()
     }
-
+    
     fun getRetrofit(): Retrofit {
         return retrofit
     }
@@ -21,5 +21,4 @@ class RetrofitService {
     fun getUserApi(): UserApi {
         return retrofit.create(UserApi::class.java)
     }
-
 }

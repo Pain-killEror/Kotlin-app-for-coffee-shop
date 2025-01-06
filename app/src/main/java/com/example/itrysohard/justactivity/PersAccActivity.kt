@@ -1,6 +1,5 @@
 package com.example.itrysohard.justactivity
 
-import android.app.Activity.RESULT_OK
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -11,11 +10,9 @@ import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityPersAccBinding
 
 
-import com.example.itrysohard.justactivity.menu.UserAdapter
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.User
 import com.example.itrysohard.retrofitforDU.RetrofitService
-import com.example.itrysohard.retrofitforDU.UserApi
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,7 +45,7 @@ class PersAccActivity : AppCompatActivity() {
             binding.PersEmail.text = if (isAdmin) "" else user.email
             binding.PersEmail.visibility = if (isAdmin) View.GONE else View.VISIBLE
 
-            binding.avatar.setImageResource(R.drawable.avatar)
+            binding.avatar.setImageResource(R.drawable.user_photo)
 
             if (isAdmin) {
                 setupRecyclerView()
@@ -75,7 +72,12 @@ class PersAccActivity : AppCompatActivity() {
         api.getAllUsers().enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if (response.isSuccessful) {
-                    userAdapter.updateUsers(response.body() ?: emptyList())
+                    // Фильтруем пользователей, исключая тех, у кого ID 1 и 2
+                    val filteredUsers = response.body()?.filter { user ->
+                        user.id != 1L && user.id != 2L // Сравниваем с Long
+                    } ?: emptyList()
+
+                    userAdapter.updateUsers(filteredUsers)
                 }
             }
 

@@ -59,8 +59,8 @@ class DishDetailActivity : AppCompatActivity() {
         if (!imageUri.isNullOrEmpty()) {
             Picasso.get()
                 .load(imageUri)
-                .resize(1000, 1000) // Укажите желаемый размер
-                .centerCrop()
+                .resize(5000, 5000) // Укажите желаемый размер
+                //.centerCrop()
                 .into(binding.imgvDishPhoto) // Убедитесь, что у вас есть imgvDishPhoto в layout
         }
         // Устанавливаем данные в UI
