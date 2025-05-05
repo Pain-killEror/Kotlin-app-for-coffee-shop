@@ -10,40 +10,52 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.R
 import com.example.itrysohard.model.User
+import com.example.itrysohard.model.answ.UserAnswDTO
+import com.example.itrysohard.model.answ.UserAnswDTORolesNoRev
 
 class UserAdapter(
     private val context: Context,
-    private var users: List<User>,
-    private val onDelete: (User) -> Unit
+    private var users: List<UserAnswDTORolesNoRev>, // Используем DTO вместо User
+    private val onBlock: (UserAnswDTORolesNoRev) -> Unit
 ) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val userName: TextView = itemView.findViewById(R.id.userName)
-        val userEmail: TextView = itemView.findViewById(R.id.userEmail)
-        val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
+        private val txtName: TextView = itemView.findViewById(R.id.userName)
+        private val txtEmail: TextView = itemView.findViewById(R.id.userEmail)
+        private val btBlock: TextView = itemView.findViewById(R.id.btnDelete)
 
-        fun bind(user: User) {
-            userName.text = user.name
-            userEmail.text = user.email
+        fun bind(user: UserAnswDTORolesNoRev) {
+            txtName.text = user.name
+            txtEmail.text = user.email
 
-            btnDelete.setOnClickListener {
-                onDelete(user)
+            val role = user.role
+            btBlock.text = if (user.role == "BLOCKED") {
+                "Разблокировать"
+            } else if (user.role == "ADMIN") {
+                "Заблокирвать Админа"
+            } else{
+                "Заблокировать"
             }
+
+
+
+            btBlock.setOnClickListener { onBlock(user) }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_user, parent, false)
-        return UserViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        UserViewHolder(
+            LayoutInflater.from(context)
+                .inflate(R.layout.item_user, parent, false)
+        )
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         holder.bind(users[position])
     }
 
-    override fun getItemCount(): Int = users.size
+    override fun getItemCount() = users.size
 
-    fun updateUsers(newUsers: List<User>) {
+    fun updateUsers(newUsers: List<UserAnswDTORolesNoRev>) {
         users = newUsers
         notifyDataSetChanged()
     }

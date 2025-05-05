@@ -7,30 +7,30 @@ data class DishServ(
     var id: Int? = null, // добавляем id
     var name: String,
     var description: String,
-    var price: Double,
-    var imageUrl: String?,
+    var price: Byte,
+    var photo: String?,
     var category: String,
-    var discount: Int
+    var discount: Byte
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         id = parcel.readValue(Int::class.java.classLoader) as? Int, // считываем id
         name = parcel.readString() ?: "",
         description = parcel.readString() ?: "", // считываем description
-        price = parcel.readDouble(),
-        imageUrl = parcel.readString(),
+        price = parcel.readByte(),
+        photo = parcel.readString(),
         category = parcel.readString() ?: "", // считываем category
-        discount = parcel.readInt()
+        discount = parcel.readByte()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(id) // записываем id
         parcel.writeString(name)
         parcel.writeString(description) // записываем description
-        parcel.writeDouble(price)
-        parcel.writeString(imageUrl)
+        parcel.writeByte(price)
+        parcel.writeString(photo)
         parcel.writeString(category) // записываем category
-        parcel.writeInt(discount)
+        parcel.writeByte(discount)
     }
 
     override fun describeContents(): Int {
@@ -48,6 +48,6 @@ data class DishServ(
     }
 
     override fun toString(): String {
-        return "DishServ(id=$id, name='$name', price=$price, imageUrl=$imageUrl, category='$category'), discount=$discount"
+        return "DishServ(id=$id, name='$name', price=$price, photo=$photo, category='$category'), discount=$discount"
     }
 }

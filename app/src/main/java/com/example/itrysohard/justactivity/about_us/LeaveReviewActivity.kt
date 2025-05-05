@@ -11,6 +11,7 @@ import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityLeaveReviewBinding
+import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
@@ -38,8 +39,8 @@ class LeaveReviewActivity : AppCompatActivity() {
         editTextDescription = findViewById(R.id.editTextDescription)
         ratingBar = findViewById(R.id.ratingBar)
         buttonSubmit = findViewById(R.id.buttonSubmit)
-
-        reviewApi = RetrofitService().getRetrofit().create(ReviewApi::class.java)
+        val tokenManager = SharedPrefTokenManager(this)
+        reviewApi = RetrofitService(this,tokenManager).getRetrofit().create(ReviewApi::class.java)
 
         buttonSubmit.setOnClickListener {
             submitReview()
@@ -60,42 +61,69 @@ class LeaveReviewActivity : AppCompatActivity() {
         val description = editTextDescription.text.toString().trim()
         val rating = ratingBar.rating
 
-        // Проверяем заполненность всех полей
         if (title.isEmpty() || description.isEmpty() || rating == 0f) {
             Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val newReview = Review(
-            username = CurrentUser.user?.name ?: "Аноним",
+        // Конвертируем Float в Byte (0-5)
+        val ratingByte = rating.toInt().coerceIn(0, 5).toByte()
+
+        // Создаем DTO без username
+        val review = Review(
             title = title,
-            rating = rating,
-            description = description,
-            createdAt = null
+            rating = ratingByte,
+            description = description
         )
 
-        Log.d("LeaveReviewActivity", "Отправляемый объект: $newReview")
+        Log.d("LeaveReviewActivity", "Отправляемый объект: $review")
         buttonSubmit.isEnabled = false
 
-        reviewApi.addReview(newReview).enqueue(object : Callback<Review> {
-            override fun onResponse(call: Call<Review>, response: Response<Review>) {
+        reviewApi.addReview(review).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 buttonSubmit.isEnabled = true
-                if (response.isSuccessful) {
-                    Toast.makeText(this@LeaveReviewActivity, "Отзыв успешно отправлен.", Toast.LENGTH_SHORT).show()
-                    finish() // Закрываем активность после успешной отправки
-                } else {
-                    val errorMessage = when (response.code()) {
-                        500 -> "Ошибка: пользователь не может оставить более 1 отзыва в месяц."
-                        else -> response.errorBody()?.string() ?: "Неизвестная ошибка"
+                when {
+                    response.isSuccessful -> {
+                        Toast.makeText(
+                            this@LeaveReviewActivity,
+                            "Отзыв успешно отправлен",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
                     }
-                    Toast.makeText(this@LeaveReviewActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                    response.code() == 429 -> {
+                        Toast.makeText(
+                            this@LeaveReviewActivity,
+                            "Ошибка: нельзя оставлять более 1 отзыва в месяц",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    response.code() == 404 -> {
+                        Toast.makeText(
+                            this@LeaveReviewActivity,
+                            "Пользователь не найден",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else -> {
+                        val error = response.errorBody()?.string() ?: "Неизвестная ошибка"
+                        Toast.makeText(
+                            this@LeaveReviewActivity,
+                            "Ошибка: $error",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 
-            override fun onFailure(call: Call<Review>, t: Throwable) {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
                 buttonSubmit.isEnabled = true
                 Log.e("LeaveReviewActivity", "Ошибка: ${t.message}")
-                Toast.makeText(this@LeaveReviewActivity, "Ошибка: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@LeaveReviewActivity,
+                    "Сетевая ошибка: ${t.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
     }

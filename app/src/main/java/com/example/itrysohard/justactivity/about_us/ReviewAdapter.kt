@@ -7,21 +7,25 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.R
-import com.example.itrysohard.model.Review
+import com.example.itrysohard.model.answ.ReviewAnswDTO
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ReviewAdapter(
-    private var reviews: List<Review>,
-    private val onClick: (Review) -> Unit // Лямбда для обработки клика на отзыв
+    private var reviews: List<ReviewAnswDTO>,
+    private val onClick: (ReviewAnswDTO) -> Unit
 ) : RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>() {
 
-    // Метод для обновления списка отзывов
-    fun setReviews(newReviews: List<Review>) {
+    fun setReviews(newReviews: List<ReviewAnswDTO>) {
         reviews = newReviews
         notifyDataSetChanged()
     }
 
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_review, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_review, parent, false)
         return ReviewViewHolder(view, onClick)
     }
 
@@ -33,22 +37,28 @@ class ReviewAdapter(
 
     class ReviewViewHolder(
         private val view: View,
-        private val onClick: (Review) -> Unit
+        private val onClick: (ReviewAnswDTO) -> Unit
     ) : RecyclerView.ViewHolder(view) {
 
-        fun bind(review: Review) {
-            val titleTextView = view.findViewById<TextView>(R.id.textViewReviewTitle)
-            val ratingBar = view.findViewById<RatingBar>(R.id.ratingBar)
-            val descriptionTextView = view.findViewById<TextView>(R.id.textViewReviewDescription)
+        private val titleTextView: TextView = view.findViewById(R.id.textViewReviewTitle)
+        private val ratingBar: RatingBar = view.findViewById(R.id.ratingBar)
+        private val descriptionTextView: TextView = view.findViewById(R.id.textViewReviewDescription)
 
+        fun bind(review: ReviewAnswDTO) {
             titleTextView.text = review.title
-            ratingBar.rating = review.rating
+            ratingBar.rating = review.rating.toFloat()
             descriptionTextView.text = review.description.take(50) + if (review.description.length > 50) "..." else ""
 
-            // Обработка клика на элемент отзыва
-            view.setOnClickListener {
-                onClick(review)
-            // Вызов лямбды при клике
+            view.setOnClickListener { onClick(review) }
+        }
+
+        private fun formatDate(dateString: String): String {
+            return try {
+                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                formatter.format(parser.parse(dateString)!!)
+            } catch (e: Exception) {
+                "Дата недоступна"
             }
         }
     }

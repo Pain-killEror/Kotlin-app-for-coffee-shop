@@ -128,7 +128,7 @@ class CartActivity : AppCompatActivity() {
             binding.tvTotalPrice.text = "Корзина пуста"
         } else {
             val totalPrice = cartItems.sumOf {
-                if (it.discount <= 0) it.price else it.price * (1 - it.discount / 100.0)
+                it.price.toDouble() * (1 - it.discount.toDouble() / 100)
             }
             binding.tvTotalPrice.text = "Итоговая стоимость: $totalPrice руб."
         }

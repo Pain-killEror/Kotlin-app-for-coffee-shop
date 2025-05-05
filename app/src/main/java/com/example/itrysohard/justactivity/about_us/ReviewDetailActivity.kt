@@ -17,8 +17,10 @@ import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
+import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.Review
+import com.example.itrysohard.model.answ.ReviewAnswDTO
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.example.itrysohard.retrofitforDU.ReviewApi
 import com.example.itrysohard.retrofitforDU.UserApi
@@ -38,11 +40,12 @@ class ReviewDetailActivity : AppCompatActivity() {
         binding = ActivityReviewDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val retrofitService = RetrofitService()
+        val tokenManager = SharedPrefTokenManager(this)
+        val retrofitService = RetrofitService(this, tokenManager)
         reviewApi = retrofitService.getRetrofit().create(ReviewApi::class.java)
 
         // Получаем отзыв из Intent
-        val review = intent.getSerializableExtra("review") as? Review
+        val review = intent.getParcelableExtra<ReviewAnswDTO>("review")
             ?: throw IllegalArgumentException("Review data is missing")
 
         // Находим элементы UI
@@ -54,9 +57,9 @@ class ReviewDetailActivity : AppCompatActivity() {
 
         // Заполняем элементы данными отзыва
         titleTextView.text = review.title
-        ratingBar.rating = review.rating
+        ratingBar.rating = review.rating.toFloat()
         descriptionTextView.text = review.description
-        writerNameTextView.text = "Автор: ${review.username}"
+        writerNameTextView.text = "Автор: ${review.user.name}"
         publicationTimeTextView.text = "Дата публикации: ${formatPublicationTime(review.createdAt.toString())}" // Форматируем дату
 
         binding.btnHome.setOnClickListener {
@@ -140,7 +143,7 @@ class ReviewDetailActivity : AppCompatActivity() {
 
     private fun formatPublicationTime(publicationTime: String): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru", "RU")) // Явно задаем русскую локаль
 
         return try {
             val date: Date = inputFormat.parse(publicationTime) ?: Date()

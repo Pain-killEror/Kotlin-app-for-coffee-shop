@@ -17,51 +17,72 @@
         android:src="@drawable/user_photo" /> <!-- Замените на имя вашего изображения -->
 
     <LinearLayout
+        android:id="@+id/linnerWithName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
         android:layout_marginEnd="5dp"
-        android:layout_marginBottom="648dp"
+
         android:layout_toEndOf="@id/avatar"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/PersName"
+            android:id="@+id/tvPersName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:text="НУну, давай нападай"
             android:textSize="22sp"
             android:textColor="@color/black"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/PersEmail"
-            android:layout_width="180dp"
+            android:id="@+id/tvPersEmail"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:visibility="visible"
+            android:text="НУну, давай навадай"
             android:textColor="@color/black"
             android:layout_height="wrap_content"
             android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Удалить этот аккаунт"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Удалить этот аккаунт"
-        android:layout_marginTop="70dp"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="78dp"/>
+
+    <EditText
+        android:id="@+id/tvSearchName"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/linnerWithName"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:background="@drawable/stroke_for_tvserchname_persacc"
+        android:hint="Имя пользователя"
+        android:padding="8dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/avatar"
+        android:layout_below="@id/tvSearchName"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"

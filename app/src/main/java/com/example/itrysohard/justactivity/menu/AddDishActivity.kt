@@ -21,12 +21,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.databinding.ActivityAddDishBinding
 import com.example.itrysohard.justactivity.MainPage.StartActivity
+import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.squareup.picasso.Picasso
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,14 +59,25 @@ class AddDishActivity : AppCompatActivity() {
             dishId = intent.getIntExtra("dish_id", -1)
             binding.etDishName.setText(intent.getStringExtra("dish_name"))
             binding.etDishDescription.setText(intent.getStringExtra("dish_description"))
-            binding.etDishPrice.setText(intent.getDoubleExtra("dish_price", 0.0).toString())
-            selectedCategory = intent.getStringExtra("dish_category")
-            binding.etDishDiscount.setText(intent.getIntExtra("dish_discount", 0).toString())
+            binding.etDishPrice.setText(intent.getByteExtra(("dish_price"), 0).toString())
+            val category = intent.getStringExtra("dish_category")
 
-            val imageUri = intent.getStringExtra("dish_image_uri")
-            if (!imageUri.isNullOrEmpty()) {
-                Picasso.get().load(imageUri).into(binding.ivDishPhoto)
+// Если категория не null, попробуем найти её позицию в адаптере спиннера
+            if (category != null) {
+                val adapter = binding.spinnerDishCategory.adapter as ArrayAdapter<String>
+                val position = adapter.getPosition(category)
+                binding.spinnerDishCategory.setSelection(position)
             }
+            binding.etDishDiscount.setText(intent.getByteExtra(("dish_discount"), 0).toString())
+
+        }
+        var imageUriString = intent.getStringExtra("dish_image_uri")
+        if (!imageUriString.isNullOrEmpty()) {
+            // Преобразуем строку в Uri для существующего изображения
+            selectedImageUri = Uri.parse(imageUriString)
+            Picasso.get()
+                .load(imageUriString)
+                .into(binding.ivDishPhoto)
         }
 
         binding.btnChoosePhoto.setOnClickListener { openGallery() }
@@ -80,7 +93,7 @@ class AddDishActivity : AppCompatActivity() {
             if (isSaving) return@setOnClickListener // Если уже сохраняем, ничего не делаем
 
             isSaving = true // Устанавливаем, что процесс сохранения начался
-            binding.btnSaveDish.isEnabled = false // Отключаем кнопку
+                binding.btnSaveDish.isEnabled = false // Отключаем кнопку
 
             if (dishId == null) {
                 saveDish()// Добавляем новое блюдо
@@ -97,6 +110,9 @@ class AddDishActivity : AppCompatActivity() {
         val description = binding.etDishDescription.text.toString()
         val price = binding.etDishPrice.text.toString().toDoubleOrNull()
         val discount = binding.etDishDiscount.text.toString().toIntOrNull() ?: 0
+
+        val priceByte = price!!.toInt().toByte()// убедитесь, что значение в диапазоне -128..127
+        val discountByte = discount.toByte()
 
         if (name.isEmpty() || description.isEmpty() || price == null || selectedImageUri == null || selectedCategory == null) {
             Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
@@ -123,24 +139,23 @@ class AddDishActivity : AppCompatActivity() {
 
         // Создание RequestBody для загрузки
         val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-        val imagePart = MultipartBody.Part.createFormData("file", file.name, requestBody)
+        val imagePart = MultipartBody.Part.createFormData("photo", file.name, requestBody)
 
-        val retrofitService = RetrofitService()
+        val tokenManager = SharedPrefTokenManager(this)
+        val retrofitService = RetrofitService(this, tokenManager)
         val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
 
         val call = dishApi.uploadDish(
             name = name.toRequestBody("text/plain".toMediaTypeOrNull()),
             description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
-            price = price.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+            price = priceByte.toString().toRequestBody("text/plain".toMediaTypeOrNull()), // отправляем как Byte
             category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
-            image = imagePart,
-            discount = discount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            photo = imagePart,
+            discount = discountByte.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         )
 
-        call.enqueue(object : Callback<DishServ> {
-            override fun onResponse(call: Call<DishServ>, response: Response<DishServ>) {
-
-
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@AddDishActivity, "Блюдо добавлено!", Toast.LENGTH_SHORT).show()
                     finish()
@@ -152,7 +167,7 @@ class AddDishActivity : AppCompatActivity() {
                 binding.btnSaveDish.isEnabled = true // Включаем кнопку снова
             }
 
-            override fun onFailure(call: Call<DishServ>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 isSaving = false // Сбрасываем состояние
                 binding.btnSaveDish.isEnabled = true // Включаем кнопку снова
                 Toast.makeText(this@AddDishActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
@@ -166,58 +181,89 @@ class AddDishActivity : AppCompatActivity() {
         val price = binding.etDishPrice.text.toString().toDoubleOrNull()
         val discount = binding.etDishDiscount.text.toString().toIntOrNull() ?: 0
 
-        if (name.isEmpty() || description.isEmpty() || price == null || selectedCategory == null) {
+        // Проверка обязательных полей
+        if (name.isEmpty() || description.isEmpty() || price == null || selectedCategory == null || selectedImageUri == null) {
             Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val retrofitService = RetrofitService()
-        val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
-
-        val imagePart = selectedImageUri?.let {
-            // Загрузка изображения как Bitmap
-            val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, it)
-
-            // Сохранение Bitmap без метаданных
-            val file = File(getExternalFilesDir(null), "image_${System.currentTimeMillis()}.jpg")
-            val outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // Сохранение в JPEG без метаданных
-            outputStream.flush()
-            outputStream.close()
-
-            // Создание RequestBody для загрузки
-            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("file", file.name, requestBody)
-        }
-
-        val call = dishApi.updateDish(
-            id = dishId!!,
-            name = name.toRequestBody("text/plain".toMediaTypeOrNull()),
-            description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
-            price = price.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
-            category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
-            image = imagePart,
-            discount = discount.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        )
-
-        call.enqueue(object : Callback<DishServ> {
-            override fun onResponse(call: Call<DishServ>, response: Response<DishServ>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@AddDishActivity, "Блюдо обновлено!", Toast.LENGTH_SHORT).show()
-                    Thread.sleep(100)
-                    finish()
-                } else {
-                    val errorMessage = response.errorBody()?.string() ?: "Неизвестная ошибка"
-                    Toast.makeText(this@AddDishActivity, "Ошибка: $errorMessage", Toast.LENGTH_SHORT).show()
+        // Проверяем, является ли изображение веб-ссылкой
+        if (selectedImageUri!!.scheme?.startsWith("http") == true) {
+            val tokenManager = SharedPrefTokenManager(this)
+            val retrofitService = RetrofitService(this, tokenManager)
+            val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
+            val priceByte = price.toInt().coerceIn(-128..127).toByte()
+            val discountByte = discount.toByte()
+            dishApi.updateDish(
+                id = dishId!!.toLong(),
+                name = name.toRequestBody("text/plain".toMediaTypeOrNull()),
+                description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
+                price = priceByte.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+                category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
+                discount = discountByte.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            ).enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@AddDishActivity, "Блюдо обновлено!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        val errorMessage = response.errorBody()?.string() ?: "Ошибка сервера"
+                        Toast.makeText(this@AddDishActivity, "Ошибка: $errorMessage", Toast.LENGTH_SHORT).show()
+                    }
                 }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Toast.makeText(this@AddDishActivity, "Сетевая ошибка: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+        else{
+        try {
+            val priceByte = price.toInt().coerceIn(-128..127).toByte()
+            val discountByte = discount.toByte()
+
+            // Обработка локального изображения
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+            val file = File(getExternalFilesDir(null), "image_${System.currentTimeMillis()}.jpg").apply {
+                outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 70, it) }
             }
+            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val imagePart = MultipartBody.Part.createFormData("photo", file.name, requestBody)
 
-            override fun onFailure(call: Call<DishServ>, t: Throwable) {
-                Toast.makeText(this@AddDishActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+            // Вызов API
+            val tokenManager = SharedPrefTokenManager(this)
+            val retrofitService = RetrofitService(this, tokenManager)
+            val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
 
+            dishApi.updateDish(
+                id = dishId!!.toLong(),
+                name = name.toRequestBody("text/plain".toMediaTypeOrNull()),
+                description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
+                price = priceByte.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+                category = selectedCategory!!.toRequestBody("text/plain".toMediaTypeOrNull()),
+                photo = imagePart,
+                discount = discountByte.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            ).enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@AddDishActivity, "Блюдо обновлено!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        val errorMessage = response.errorBody()?.string() ?: "Ошибка сервера"
+                        Toast.makeText(this@AddDishActivity, "Ошибка: $errorMessage", Toast.LENGTH_SHORT).show()
+                    }
+                }
 
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Toast.makeText(this@AddDishActivity, "Сетевая ошибка: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+        } catch (e: Exception) {
+            Log.e("UpdateDish", "Ошибка: ${e.stackTraceToString()}")
+            Toast.makeText(this, "Ошибка обработки изображения", Toast.LENGTH_SHORT).show()
+        }
+        }
     }
 
     private fun showDeleteConfirmationDialog() {
@@ -233,7 +279,8 @@ class AddDishActivity : AppCompatActivity() {
     }
 
     private fun deleteDish(){
-        val retrofitService = RetrofitService()
+        val tokenManager = SharedPrefTokenManager(this)
+        val retrofitService = RetrofitService(this, tokenManager)
         val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
         dishApi.deleteDish(dishId!!).enqueue(object: Callback<Void>{
             override fun onResponse(call: Call<Void>, response: Response<Void>) {

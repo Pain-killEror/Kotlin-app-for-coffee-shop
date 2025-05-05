@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.MyApplication
 import com.example.itrysohard.R
 import com.example.itrysohard.justactivity.MainPage.StartActivity
+import com.example.itrysohard.jwt.JWTDecoder
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
@@ -34,7 +35,7 @@ import retrofit2.Response
 
 class DishAdapter(private val activity: MenuActivity, private val onDishClick: (DishServ) -> Unit) : RecyclerView.Adapter<DishAdapter.DishViewHolder>() {
     private val dishes = mutableListOf<DishServ>()
-    private var isAdmin = CurrentUser.isAdmin
+
 
     fun setDishes(newDishes: List<DishServ>) {
         dishes.clear()
@@ -42,10 +43,7 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
         notifyDataSetChanged()
     }
 
-    fun updateAdminStatus(isAdmin: Boolean) {
-        this.isAdmin = isAdmin
-        notifyDataSetChanged()
-    }
+
 
     fun refresh() {
         notifyDataSetChanged()
@@ -77,12 +75,13 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
         private val btnEdit: ImageButton = itemView.findViewById(R.id.btnEdit)
         private val btnInformation: ImageButton = itemView.findViewById(R.id.btnInformation)
         private val dishDiscount: TextView = itemView.findViewById(R.id.tvDishDiscount)
-        val isAdmin = CurrentUser.isAdmin
+
+        private lateinit var dishApi: DishApi
 
 
         fun bind(dish: DishServ) {
             Picasso.get()
-                .load(dish.imageUrl)
+                .load(dish.photo)
                 .resize(500, 500)
                 .centerInside()
                 .into(dishImage)
@@ -116,7 +115,7 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
 
 
 
-            btnEdit.visibility = if (isAdmin) View.VISIBLE else View.GONE
+            btnEdit.visibility = if (isAdmin()) View.VISIBLE else View.GONE
 
 
             btnEdit.setOnClickListener {
@@ -126,7 +125,8 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
                         putExtra("dish_name", dish.name)
                         putExtra("dish_description", dish.description)
                         putExtra("dish_price", dish.price)
-                        putExtra("dish_image_uri", dish.imageUrl)
+                        putExtra("dish_image_uri", dish.photo)
+                        putExtra("dish_category", dish.category)
                         putExtra("dish_discount", dish.discount)
                     }
                     activity.startActivity(intent)
@@ -211,7 +211,11 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
             }
         }
 
-
+        private fun isAdmin(): Boolean {
+            val prefs = itemView.context.getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+            val accessToken = prefs.getString("ACCESS_TOKEN", null)
+            return JWTDecoder.getRole(accessToken) == "ROLE_ADMIN"
+        }
 
         private fun addToCartDish(dish: DishServ, context: Context, count: Int) {
             val app = context.applicationContext as MyApplication

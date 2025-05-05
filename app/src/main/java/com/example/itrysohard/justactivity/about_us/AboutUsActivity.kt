@@ -1,5 +1,6 @@
 package com.example.itrysohard.justactivity.about_us
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -18,8 +19,12 @@ import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.example.itrysohard.justactivity.menu.MenuActivity
+import com.example.itrysohard.jwt.JWTDecoder
+import com.example.itrysohard.jwt.SharedPrefTokenManager
+import com.example.itrysohard.jwt.TokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.User
+import com.example.itrysohard.model.answ.ReviewAnswDTO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,18 +36,18 @@ class AboutUsActivity : AppCompatActivity() {
     private lateinit var reviewApi: ReviewApi
     private lateinit var myApplication: MyApplication
     private lateinit var binding: ActivityAboutUsBinding
+    private lateinit var tokenManager: TokenManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAboutUsBinding.inflate(layoutInflater) // Инициализация View Binding
         setContentView(binding.root) // Устанавливаем корневой элемент из binding
+        tokenManager = SharedPrefTokenManager(this)
 
         // Инициализация RecyclerView
         reviewAdapter = ReviewAdapter(emptyList()) { review ->
-            // Обработка клика на отзыв
             val intent = Intent(this, ReviewDetailActivity::class.java).apply {
-                putExtra("review", review)
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // Удаляем все предыдущие активности
+                putExtra("review", review) // Теперь работает, так как DTO Parcelable
             }
             startActivity(intent)
         }
@@ -51,7 +56,8 @@ class AboutUsActivity : AppCompatActivity() {
         binding.recyclerViewReviews.layoutManager = LinearLayoutManager(this)
 
         // Инициализация Retrofit и API
-        reviewApi = RetrofitService().getRetrofit().create(ReviewApi::class.java)
+        val tokenManager = SharedPrefTokenManager(this)
+        reviewApi = RetrofitService(this,tokenManager).getRetrofit().create(ReviewApi::class.java)
 
         // Загрузка отзывов
         loadReviews()
@@ -91,80 +97,113 @@ class AboutUsActivity : AppCompatActivity() {
     }
 
     private fun showAuthorizationDialog() {
-        if (CurrentUser.user == null) {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Необходимо авторизоваться")
-            builder.setMessage("Вы не авторизованы. Пожалуйста, авторизуйтесь или вернитесь к просмотру отзывов.")
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val accessToken = prefs.getString("ACCESS_TOKEN", null)
+        val refreshToken = prefs.getString("REFRESH_TOKEN", null)
+        val tokenManager = SharedPrefTokenManager(this)
 
-            builder.setPositiveButton("Аторизоваться") { _, _ ->
-                // Перенаправление на LeaveReviewActivity
-                val intent = Intent(this, RegAuthActivity::class.java)
-                startActivity(intent)
-            }
 
-            builder.setNegativeButton("Отмена") { dialog, _ ->
-                dialog.dismiss() // Закрываем диалог
-            }
+        val isAuthorized = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) != null
 
-            val dialog = builder.create()
-            dialog.show()
+        if (!isAuthorized) {
+            AlertDialog.Builder(this).apply {
+                setTitle("Требуется авторизация")
+                setMessage("Для выполнения действия необходима авторизация под пользователем")
+                setPositiveButton("Войти") { _, _ ->
+                    startActivity(Intent(context, RegAuthActivity::class.java))
+                }
+                setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+            }.create().show()
+        } else {
+            startActivity(Intent(this, LeaveReviewActivity::class.java))
         }
-        else startActivity(Intent(this, LeaveReviewActivity::class.java))
     }
 
     private fun showAuthorizationDialogPers() {
-        if (CurrentUser.user == null) {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Необходимо авторизоваться")
-            builder.setMessage("Вы не авторизованы. Пожалуйста, авторизуйтесь чтобы получить доступ к личному кабинету.")
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val accessToken = prefs.getString("ACCESS_TOKEN", null)
+        val refreshToken = prefs.getString("REFRESH_TOKEN", null)
+        val tokenManager = SharedPrefTokenManager(this)
 
-            builder.setPositiveButton("Аторизоваться") { _, _ ->
-                // Перенаправление на LeaveReviewActivity
-                val intent = Intent(this, RegAuthActivity::class.java)
-                startActivity(intent)
-            }
 
-            builder.setNegativeButton("Отмена") { dialog, _ ->
-                dialog.dismiss() // Закрываем диалог
-            }
+        val isAuthorized = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) != null
 
-            val dialog = builder.create()
-            dialog.show()
+
+        if (!isAuthorized) {
+            AlertDialog.Builder(this).apply {
+                setTitle("Доступ ограничен")
+                setMessage("Для входа в личный кабинет требуется авторизация")
+                setPositiveButton("Войти") { _, _ ->
+                    startActivity(Intent(context, RegAuthActivity::class.java))
+                }
+                setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+            }.create().show()
+        } else {
+            startActivity(Intent(this, PersAccActivity::class.java))
         }
-        else startActivity(Intent(this, PersAccActivity::class.java))
     }
 
 
     override fun onResume() {
         super.onResume()
         loadReviews()
-        updateCartCountDisplay()
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val accessToken = prefs.getString("ACCESS_TOKEN", null)
+        val refreshToken = prefs.getString("REFRESH_TOKEN", null)
 
-        if (CurrentUser.isAdmin == true)
-            binding.buttonLeaveReview.visibility = View.GONE
-        if (CurrentUser.isBlocked == true)
-            binding.buttonLeaveReview.visibility = View.GONE
+        val isAuthorized = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken)
 
+        if (!isAuthorized) {
+            showLoginDialog()
+        }
     }
+
+    private fun showLoginDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Сессия истекла")
+            .setMessage("Для продолжения войдите снова")
+            .setPositiveButton("Войти") { _, _ ->
+                startActivity(Intent(this, RegAuthActivity::class.java))
+            }
+            .setCancelable(false)
+            .show()
+    }
+
     private fun updateCartCountDisplay() {
         binding.tvCartCount.text = myApplication.cartItemCount.toString()
     }
 
     private fun loadReviews() {
-        reviewApi.getAllReviews().enqueue(object : Callback<List<Review>> {
-            override fun onResponse(call: Call<List<Review>>, response: Response<List<Review>>) {
+        reviewApi.getAllReviews().enqueue(object : Callback<List<ReviewAnswDTO>> {
+            override fun onResponse(call: Call<List<ReviewAnswDTO>>, response: Response<List<ReviewAnswDTO>>) {
                 if (response.isSuccessful) {
-                    val reviews = response.body()?.reversed() ?: emptyList()
-                    reviewAdapter.setReviews(reviews)
-
+                    reviewAdapter.setReviews(response.body() ?: emptyList()) // Используем переименованный метод
+                } else if (response.code() == 401) {
+                    tokenManager.clearTokens() // Теперь tokenManager доступен
+                    showAuthorizationDialog()
                 } else {
-                    Toast.makeText(this@AboutUsActivity, "Ошибка загрузки отзывов: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AboutUsActivity,
+                        "Ошибка: ${response.errorBody()?.string()}",
+                        Toast.LENGTH_LONG).show()
                 }
             }
 
-            override fun onFailure(call: Call<List<Review>>, t: Throwable) {
-                Toast.makeText(this@AboutUsActivity, "Ошибка загрузки: ${t.message}", Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<List<ReviewAnswDTO>>, t: Throwable) {
+                Toast.makeText(this@AboutUsActivity,
+                    "Ошибка сети: ${t.message}",
+                    Toast.LENGTH_SHORT).show()
+                t.printStackTrace()
             }
+
+
         })
+
+
     }
+
 }

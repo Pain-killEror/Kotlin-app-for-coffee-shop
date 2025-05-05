@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.MyApplication
 import com.example.itrysohard.databinding.ActivityDishDetailBinding
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
@@ -112,10 +113,10 @@ class DishDetailActivity : AppCompatActivity() {
                 id = dishId,
                 name = name,
                 description = description,
-                price = price,
-                imageUrl = imageUri,
+                price = price.toInt().toByte(),
+                photo = imageUri,
                 category = category,
-                discount = discount
+                discount = discount.toByte()
             )
             addToCart(dishToAdd)
         }
@@ -201,7 +202,8 @@ class DishDetailActivity : AppCompatActivity() {
     }
 
     private fun deleteDish(id: Int) {
-        val retrofitService = RetrofitService()
+        val tokenManager = SharedPrefTokenManager(this)
+        val retrofitService = RetrofitService(this, tokenManager)
         val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
         val call: Call<Void> = dishApi.deleteDish(id)
 

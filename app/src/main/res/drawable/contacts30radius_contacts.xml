@@ -1,0 +1,7 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Цвет фона -->
+    <solid android:color="#D9D9D9" /> <!-- Замените на ваш цвет фона -->
+
+    <!-- Скругление углов -->
+    <corners android:radius="30dp" /> <!-- Радиус скругления -->
+</shape>

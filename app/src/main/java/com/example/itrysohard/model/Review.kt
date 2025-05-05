@@ -1,12 +1,14 @@
 package com.example.itrysohard.model
 
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class Review(
-    var id: Long? = null,
-    val username: String,
+    @SerializedName("title")
     val title: String,
-    val rating: Float,
-    val description: String,
-    val createdAt: String?
+    @SerializedName("rating")
+    val rating: Byte, // Важно использовать Byte вместо Float
+    @SerializedName("description")
+    val description: String
 ) : Serializable
+

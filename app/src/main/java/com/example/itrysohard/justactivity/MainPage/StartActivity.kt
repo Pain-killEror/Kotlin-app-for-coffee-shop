@@ -1,12 +1,12 @@
 package com.example.itrysohard.justactivity.MainPage
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.BackPress.ActivityHistoryImpl
@@ -21,10 +21,26 @@ import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.about_us.AboutUsActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.justactivity.menu.MenuActivity
+import com.example.itrysohard.jwt.JWTDecoder
+import com.example.itrysohard.jwt.LoginResponse
+import com.example.itrysohard.jwt.RefreshTokenResponse
 import com.example.itrysohard.model.CurrentUser
-import com.example.itrysohard.model.CurrentUser.isBlocked
-import com.example.itrysohard.model.CurrentUser.user
 import com.example.itrysohard.model.User
+import com.example.itrysohard.jwt.SecurityHelper
+import com.example.itrysohard.jwt.SharedPrefTokenManager
+import com.example.itrysohard.jwt.TokenManager
+
+import android.util.Base64
+import android.util.Log
+import com.example.itrysohard.jwt.AuthInterceptor
+import com.example.itrysohard.jwt.RefreshRequest
+import com.example.itrysohard.retrofitforDU.UserApi
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class StartActivity : AppCompatActivity() {
 
@@ -35,10 +51,18 @@ class StartActivity : AppCompatActivity() {
     private lateinit var myApplication: MyApplication
     private lateinit var loginActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var logoutActivityResultLauncher: ActivityResultLauncher<Intent>
-
+    private val tokenManager by lazy { SharedPrefTokenManager(this) }
+    private val userApi: UserApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("http://192.168.0.105:8080/") 
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(UserApi::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //checkTokens()
         ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -116,6 +140,32 @@ class StartActivity : AppCompatActivity() {
         }*/
     }
 
+    /*private fun checkTokens() {
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val encryptedRefreshToken = prefs.getString("refresh_token", null)
+        val refreshTokenExpiry = prefs.getLong("refresh_token_expiry", 0L)
+
+        // Расшифровка для проверки
+        val refreshToken = encryptedRefreshToken?.let {
+            SecurityHelper.decrypt(this, it)
+        }
+        val isRefreshTokenValid = !refreshToken.isNullOrEmpty() &&
+                System.currentTimeMillis() < refreshTokenExpiry
+
+        android.util.Log.d("AUTH", """
+        Проверка токенов:
+        - Refresh Token: ${refreshToken?.take(5)}...
+        - Expiry: $refreshTokenExpiry
+        - Current Time: ${System.currentTimeMillis()}
+        - Valid: $isRefreshTokenValid
+    """.trimIndent())
+
+        if (!isRefreshTokenValid) {
+            prefs.edit().clear().apply()
+            showLoginDialog()
+        }
+    }*/
+
     override fun onBackPressed() {
         BackPressManager.handleBackPress(this) {
             super.onBackPressed()
@@ -133,47 +183,152 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun showAuthorizationDialogPers() {
-        if (CurrentUser.user == null) {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Необходимо авторизоваться")
-            builder.setMessage("Вы не авторизованы. Пожалуйста, авторизуйтесь чтобы получить доступ к личному кабинету.")
+        val tokenManager = SharedPrefTokenManager(this)
+        val accessToken = tokenManager.getAccessToken()
 
-            builder.setPositiveButton("Аторизоваться") { _, _ ->
-                // Перенаправление на LeaveReviewActivity
-                val intent = Intent(this, RegAuthActivity::class.java)
-                startActivity(intent)
-                
-            }
+        val isAuthorized = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) != null
 
-            builder.setNegativeButton("Отмена") { dialog, _ ->
-                dialog.dismiss() // Закрываем диалог
-            }
 
-            val dialog = builder.create()
-            dialog.show()
+        if (!isAuthorized) {
+            AlertDialog.Builder(this).apply {
+                setTitle("Доступ ограничен")
+                setMessage("Для входа в личный кабинет требуется авторизация")
+                setPositiveButton("Войти") { _, _ ->
+                    startActivity(Intent(context, RegAuthActivity::class.java))
+                }
+                setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+            }.create().show()
+        } else {
+            startActivity(Intent(this, PersAccActivity::class.java))
         }
-        else startActivity(Intent(this, PersAccActivity::class.java))
     }
 
     override fun onResume() {
         super.onResume()
-        checkUserAuthorization()
+        if (!isFinishing) { // Проверка, что активити не в процессе завершения
+            checkAuthState()
+        }
         updateCartCountDisplay()
-
     }
 
-    private fun checkUserAuthorization() {
-        // Проверяем, есть ли текущий пользователь
-        if (CurrentUser.user == null) {
-            isUserLoggedIn = false
-            setNotLoggedInUIVisibility(true) // Показываем элементы
+
+    private fun checkAuthState() {
+        // Создаем экземпляр TokenManager
+        val tokenManager = SharedPrefTokenManager(this)
+
+        // Получаем токены и проверяем, существуют ли они
+        val accessToken = tokenManager.getAccessToken()
+        val refreshToken = tokenManager.getRefreshToken()
+        val accessExists = accessToken != null
+        val refreshExists = refreshToken != null
+
+        Log.d("AUTH_CHECK", "AccessToken exists: $accessExists")
+        Log.d("AUTH_CHECK", "RefreshToken exists: $refreshExists")
+
+        // Проверяем, не истек ли срок действия токенов
+        if (accessExists && !tokenManager.isAccessExpired()) {
+            Log.d("AUTH_CHECK", "Access token is valid. Пользователь авторизован.")
+            setNotLoggedInUIVisibility(false)
+        } else if (refreshExists && !tokenManager.isRefreshExpired()) {
+            Log.d("AUTH_CHECK", "Access token истек, но refresh token действителен. Возможно, нужно обновить access token.")
+            refreshAccessToken()
+            setNotLoggedInUIVisibility(false)
         } else {
-            isUserLoggedIn = true
-            userName = CurrentUser.user?.name
-            userEmail = CurrentUser.user?.email
-            setNotLoggedInUIVisibility(false) // Скрываем элементы
+            Log.d("AUTH_CHECK", "Нет действительных токенов. Пользователь не авторизован.")
+            setNotLoggedInUIVisibility(true)
         }
     }
+
+
+
+
+    private fun checkTokensAndRefresh() {
+        val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val accessToken = sharedPref.getString("ACCESS_TOKEN", null)
+        val refreshToken = sharedPref.getString("REFRESH_TOKEN", null)
+
+        when {
+            refreshToken == null || isTokenExpired(refreshToken) -> {
+                startActivity(Intent(this, RegAuthActivity::class.java))
+                finish()
+            }
+            accessToken == null || isTokenExpired(accessToken) -> refreshAccessToken()
+            else -> return // Оба токена валидны
+        }
+    }
+
+    private fun refreshAccessToken() {
+        val refreshToken = tokenManager.getRefreshToken()
+        Log.d("REFRESH", "Полученный refresh token: $refreshToken")
+
+        if (refreshToken.isNullOrEmpty()) {
+            Log.e("REFRESH", "Refresh token is null или пустой, запрос не отправляется!")
+            // Здесь можно, например, перенаправить пользователя на аутентификацию
+            return
+        }
+
+
+
+
+        userApi.refreshToken(RefreshRequest(refreshToken)).enqueue(object : Callback<RefreshTokenResponse> {
+            override fun onResponse(
+                call: Call<RefreshTokenResponse>,
+                response: Response<RefreshTokenResponse>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { tokens ->
+                        tokenManager.saveTokens(tokens.accessToken, tokens.refreshToken)
+                        Log.d("REFRESH", "Токены успешно обновлены.")
+                    }
+                } else {
+                    Log.e("REFRESH", "Ответ не успешен, код: ${response.code()}")
+                    getSharedPreferences("auth", Context.MODE_PRIVATE).edit().clear().apply()
+                    startActivity(Intent(this@StartActivity, RegAuthActivity::class.java))
+                    finish()
+                }
+            }
+
+            override fun onFailure(call: Call<RefreshTokenResponse>, t: Throwable) {
+                Log.e("REFRESH", "Ошибка сети при обновлении токенов: ${t.message}")
+                showToast("Ошибка сети: ${t.message}")
+            }
+        })
+    }
+
+
+
+    // Добавьте эту функцию в класс Activity
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun isTokenExpired(token: String): Boolean {
+        return try {
+            val payload = token.split(".")[1]
+            val json = String(Base64.decode(payload, Base64.URL_SAFE), Charsets.UTF_8)
+            val expTime = JSONObject(json).getLong("exp") * 1000
+            expTime < System.currentTimeMillis()
+        } catch (e: Exception) {
+            true
+        }
+    }
+
+    private fun showLoginDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Сессия истекла")
+            .setMessage("Для продолжения войдите снова")
+            .setPositiveButton("Войти") { _, _ ->
+                startActivity(Intent(this, RegAuthActivity::class.java))
+            }
+            .setNegativeButton("Отмена") {  dialog, _ -> dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+
 
     private fun setNotLoggedInUIVisibility(isVisible: Boolean) {
         val visibility = if (isVisible) View.VISIBLE else View.GONE
@@ -187,8 +342,8 @@ class StartActivity : AppCompatActivity() {
         userEmail = data?.getStringExtra("userEmail")
 
         // Обновляем текущего пользователя
-        CurrentUser.user = User(userName ?: "", userEmail ?: "", "", isBlocked) // Пустой пароль
-
+        //CurrentUser.user = User(userName ?: "", userEmail ?: "", "", isBlocked)        // for kotlin serv
+        CurrentUser.user = User(userName ?: "", userEmail ?: "", "")        // for java serv
         // Устанавливаем статус администратора
         CurrentUser.isAdmin = data?.getBooleanExtra("isAdmin", false) ?: false
 

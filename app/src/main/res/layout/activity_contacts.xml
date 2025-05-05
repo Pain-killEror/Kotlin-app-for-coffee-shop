@@ -3,162 +3,446 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="#B9B9BB"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#B9B9BB"
     tools:context=".justactivity.MainPage.PagesOnMain.ContactsActivity">
+
 
     <FrameLayout
         android:id="@+id/frameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="210dp"
-        android:layout_marginTop="93dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineUpDown"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
+        app:layout_constraintTop_toTopOf="@+id/guidelineUp">
 
 
+        <FrameLayout
+            android:id="@+id/wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
 
-
-           <FrameLayout
-                android:id="@+id/wrapper"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|top"
-                android:clipToPadding="false"
-                android:padding="12dp">
+            android:clipToPadding="false"
+            android:padding="12dp">
 
 
             <LinearLayout
                 android:id="@+id/shadowLiner"
-                android:layout_width="322dp"
-                android:layout_height="166dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal|top"
                 android:background="@drawable/rounded_background_contacts"
                 android:elevation="0dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="72dp"
                     android:layout_marginTop="17dp"
+                    android:layout_marginRight="15dp"
+                    android:autoSizeMaxTextSize="30sp"
+                    android:autoSizeMinTextSize="12sp"
+                    android:autoSizeTextType="uniform"
+                    android:breakStrategy="simple"
                     android:fontFamily="@font/aclonicaregular"
-                    android:text="ЧАСЫ РАБОТЫ \n08:00-22:00   -\nбудни\n10:00-22:00    -\nвыходные"
+                    android:gravity="start"
+                    android:hyphenationFrequency="none"
+                    android:inputType="textMultiLine"
+                    android:text="ЧАСЫ РАБОТЫ 08:00-22:00 - будни \n10:00-22:00 - выходные"
                     android:textColor="@android:color/black"
                     android:textSize="24sp" />
 
             </LinearLayout>
-           </FrameLayout>
-
-
-
-        <View
-            android:layout_width="82dp"
-            android:layout_height="82dp"
-            android:layout_gravity="top|start"
-            android:background="@drawable/circle_background_up_contacts"
-            android:elevation="8dp"
-            android:shadowColor="#AA000000"
-            android:shadowDx="0"
-            android:shadowDy="4"
-            android:shadowRadius="8"
-            android:translationX="20dp"
-            android:translationZ="4dp" />
-        <!-- Круглый элемент в верхнем левом углу -->
+        </FrameLayout>
 
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/circleDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="-184dp"
+        android:layout_marginBottom="-110dp"
+
+        app:layout_constraintStart_toStartOf="@+id/guidelineMapLeft"
+        app:layout_constraintTop_toTopOf="@+id/guidelineCircl">
+
+        <View
+            android:id="@+id/shadowDown"
+
+            android:layout_width="360dp"
+            android:layout_height="360dp"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@drawable/circle_background_up_contacts"
+            android:elevation="0dp"
+            android:orientation="vertical">
+
+        </View>
+        <!-- Круглый элемент в верхнем левом углу -->
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineUpCirkleRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineUpCirkleLeft"
+        app:layout_constraintTop_toTopOf="@id/guidelineUpUP">
+
+        <FrameLayout
+            android:id="@+id/circle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp">
+
+            <View
+                android:id="@+id/shadowView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal|top"
+                android:background="@drawable/circle_background_up_contacts"
+                android:elevation="0dp"
+                android:orientation="vertical">
+
+            </View>
+            <!-- Круглый элемент в верхнем левом углу -->
+        </FrameLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/wrapper2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="12dp"
+        app:layout_constraintDimensionRatio="1:0.7"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineTextDownRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineTextDownLeft"
+        app:layout_constraintTop_toTopOf="@+id/guidelineContacts">
+
+
+        <LinearLayout
+            android:id="@+id/shadowLiner2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|top"
+            android:background="@drawable/contacts30radius_contacts"
+            android:elevation="0dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/medulaone_regular"
+                android:text="контакты"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginLeft="12dp"
+                android:fontFamily="@font/medulaone_regular"
+                android:text="+375 29 952-26-89"
+                android:textColor="@android:color/black"
+                android:textSize="40sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/rounded_background_contacts"
+        app:layout_constraintDimensionRatio="1:1"
+
+        app:layout_constraintEnd_toStartOf="@+id/guidelineRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineMapLeft"
+        app:layout_constraintTop_toTopOf="@+id/guidelineMap">
+
+        <ImageButton
+            android:id="@+id/btnMap"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_map" />
+
+    </FrameLayout>
+
+
+    <ImageButton
+        android:id="@+id/btnInst"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:adjustViewBounds="true"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icon_inst"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineInstRight"
+        app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
+        app:layout_constraintTop_toTopOf="@+id/guidelineInst" />
 
 
     <androidx.cardview.widget.CardView
         android:id="@+id/oval_background"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_gravity="bottom|center"
-        android:layout_marginLeft="75dp"
-        android:layout_marginRight="75dp"
-        android:layout_marginBottom="10dp"
         app:cardBackgroundColor="#650705"
         app:cardCornerRadius="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/guidelinePanelUp"
+        app:layout_constraintEnd_toEndOf="@id/guidelinePanelRight"
+        app:layout_constraintStart_toStartOf="@id/guidelinePanelLeft"
+        app:layout_constraintTop_toTopOf="@id/guidelinePanelDown">
 
         <!-- Кнопки внутри овальной рамки -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="10sp"
+            >
 
-            <ImageButton
-                android:id="@+id/btnHome"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:background="?attr/selectableItemBackground"
-                android:maxWidth="30dp"
-                android:maxHeight="30dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_home" />
 
-            <ImageButton
-                android:id="@+id/btnMenu"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:background="?attr/selectableItemBackground"
-                android:maxWidth="30dp"
-                android:maxHeight="30dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_menu" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <RelativeLayout
-                android:id="@+id/rlCart"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
+
 
                 <ImageButton
-                    android:id="@+id/btnCart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/btnHome"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:adjustViewBounds="true"
                     android:background="?attr/selectableItemBackground"
-                    android:maxWidth="30dp"
-                    android:maxHeight="30dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/icon_shopping_bag" />
+                    android:src="@drawable/icon_home"
+                    app:layout_constraintEnd_toStartOf="@+id/btnMenu"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvCartCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/btnCart"
-                    android:layout_marginStart="4dp"
-                    android:text="0"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:visibility="visible" />
-            </RelativeLayout>
+                <ImageButton
+                    android:id="@+id/btnMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/icon_menu"
+                    app:layout_constraintEnd_toStartOf="@+id/rlCart"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/btnHome" />
 
-            <ImageButton
-                android:id="@+id/btnPersAcc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:background="?attr/selectableItemBackground"
-                android:maxWidth="30dp"
-                android:maxHeight="30dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_user" />
+                <RelativeLayout
+                    android:id="@+id/rlCart"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    app:layout_constraintEnd_toStartOf="@+id/btnPersAcc"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/btnMenu">
+
+                    <ImageButton
+                        android:id="@+id/btnCart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:background="?attr/selectableItemBackground"
+
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/icon_shopping_bag" />
+
+                    <TextView
+                        android:id="@+id/tvCartCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_toRightOf="@id/btnCart"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:visibility="visible" />
+                </RelativeLayout>
+
+                <ImageButton
+                    android:id="@+id/btnPersAcc"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/icon_user"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/rlCart"
+                    app:layout_constraintTop_toTopOf="@+id/btnHome" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineUpCirkleLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.03" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineUpCirkleRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.28" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.08" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.92" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTextDownLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.21" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTextDownRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.785" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMapLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.53" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineInstRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.41" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineUpUP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.005" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.02" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineUpDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.245" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.26" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineInst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.34" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineContacts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.59" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineCircl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.71" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelinePanelDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.915" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelinePanelUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.989" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelinePanelLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.183" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelinePanelRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.817" />
+
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

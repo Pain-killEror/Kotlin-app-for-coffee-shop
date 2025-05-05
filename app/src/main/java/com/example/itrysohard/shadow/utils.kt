@@ -16,7 +16,8 @@ import kotlin.math.roundToInt
 fun wrapInCustomShadowWithOffset(
     view: View,
     @ColorRes shadowColor: Int,
-    resources: Resources
+    resources: Resources,
+    shadowRadius: Int
 ) {
 
     val shadowColorValue = ContextCompat.getColor(view.context, shadowColor)
@@ -41,7 +42,7 @@ fun wrapInCustomShadowWithOffset(
         shadowBlur - offset, //blur
         0f, //dx
         offset, //dy
-        getColorWithAlpha(shadowColorValue, 0.8f) //color
+        getColorWithAlpha(shadowColorValue, 1f) //color
     )
     val filter = BlurMaskFilter(offset, BlurMaskFilter.Blur.OUTER)
     view.setLayerType(View.LAYER_TYPE_SOFTWARE, shapeDrawable.paint)
@@ -51,7 +52,7 @@ fun wrapInCustomShadowWithOffset(
 
 
 
-    val radius = 40.toDp(view.context.resources)
+    val radius = shadowRadius.toDp(view.context.resources)
     val outerRadius = floatArrayOf(
         radius, radius, //top-left
         radius, radius, //top-right

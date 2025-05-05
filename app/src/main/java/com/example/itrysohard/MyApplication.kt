@@ -9,6 +9,7 @@ class MyApplication : Application() {
     var cartItemCount: Int = 0
     var selectedSizes = mutableMapOf<Int, String?>()
 
+
     override fun onCreate() {
         super.onCreate()
 

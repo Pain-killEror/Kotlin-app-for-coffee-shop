@@ -1,6 +1,7 @@
 package com.example.itrysohard.justactivity.menu
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -23,6 +24,8 @@ import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
+import com.example.itrysohard.jwt.JWTDecoder
+import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
@@ -212,7 +215,15 @@ class MenuActivity : AppCompatActivity() {
     }
 
     private fun showAuthorizationDialogPers() {
-        if (CurrentUser.user == null) {
+
+        val tokenManager = SharedPrefTokenManager(this)
+        val accessToken = tokenManager.getAccessToken()
+
+        val isAuthorized = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) != null
+
+        if (!isAuthorized) {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Необходимо авторизоваться")
             builder.setMessage("Вы не авторизованы. Пожалуйста, авторизуйтесь чтобы получить доступ к личному кабинету.")
@@ -238,7 +249,8 @@ class MenuActivity : AppCompatActivity() {
 
     private fun loadDishes() {
         GlobalScope.launch(Dispatchers.Main) {
-            val retrofitService = RetrofitService()
+            val tokenManager = SharedPrefTokenManager(this@MenuActivity)
+            val retrofitService = RetrofitService(this@MenuActivity, tokenManager)
             val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
 
             try {
@@ -276,7 +288,7 @@ class MenuActivity : AppCompatActivity() {
         val intent = Intent(this, DishDetailActivity::class.java)
         intent.putExtra("DISH_NAME", dish.name)
         intent.putExtra("DISH_DESCRIPTION", dish.description)
-        intent.putExtra("DISH_IMAGE_URL", dish.imageUrl)
+        intent.putExtra("DISH_IMAGE_URL", dish.photo)
         intent.putExtra("DISH_PRICE", dish.price)
         intent.putExtra("DISH_CATEGORY", dish.category)
         intent.putExtra("DISH_ID", dish.id)
@@ -299,18 +311,23 @@ class MenuActivity : AppCompatActivity() {
     }
 
 
+    private fun isAdmin(): Boolean {
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val accessToken = prefs.getString("ACCESS_TOKEN", null)
+        val role = JWTDecoder.getRole(accessToken)
+        return JWTDecoder.getRole(accessToken) == "ROLE_ADMIN"
+    }
+
     override fun onResume() {
         super.onResume()
-        val isAdmin = CurrentUser.isAdmin
+        val isAdmin = isAdmin()
         // Обновите адаптеры
-        breakfastAdapter.updateAdminStatus(isAdmin)
-        dessertAdapter.updateAdminStatus(isAdmin)
-        drinkAdapter.updateAdminStatus(isAdmin)
+
         // Перезагрузите данные
         loadDishes()
         cartCount = (application as MyApplication).cartItems.size
         updateCartCount(cartCount)
-        binding.btnAddDish.visibility = if (isAdmin) View.VISIBLE else View.GONE
+        binding.btnAddDish.visibility = if (isAdmin()) View.VISIBLE else View.GONE
         breakfastAdapter.refresh()
         dessertAdapter.refresh()
         drinkAdapter.refresh()
