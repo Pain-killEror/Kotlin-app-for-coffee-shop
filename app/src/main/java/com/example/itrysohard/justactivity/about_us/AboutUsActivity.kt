@@ -3,7 +3,6 @@ package com.example.itrysohard.justactivity.about_us
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -15,15 +14,12 @@ import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
-import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.jwt.JWTDecoder
 import com.example.itrysohard.jwt.SharedPrefTokenManager
 import com.example.itrysohard.jwt.TokenManager
-import com.example.itrysohard.model.CurrentUser
-import com.example.itrysohard.model.User
 import com.example.itrysohard.model.answ.ReviewAnswDTO
 import retrofit2.Call
 import retrofit2.Callback
@@ -63,6 +59,7 @@ class AboutUsActivity : AppCompatActivity() {
         loadReviews()
 
         binding.buttonLeaveReview.setOnClickListener {
+            showAuthorizationDialog()
             startActivity(Intent(this, LeaveReviewActivity::class.java))
 
         }
@@ -107,16 +104,40 @@ class AboutUsActivity : AppCompatActivity() {
                 !JWTDecoder.isExpired(accessToken) &&
                 JWTDecoder.getRole(accessToken) != null
 
-        if (!isAuthorized) {
+        val isBlocked = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) == "ROLE_BLOCKED"
+
+        val isAdminModerator = accessToken != null &&
+                !JWTDecoder.isExpired(accessToken) &&
+                JWTDecoder.getRole(accessToken) == "ROLE_ADMIN" || JWTDecoder.getRole(accessToken) == "ROLE_MODERATOR"
+
+        if (isAdminModerator) {
+            AlertDialog.Builder(this).apply {
+                setTitle("Вы администрация")
+                setMessage("Ваш аккаунт является аккаунтом администрации на неопределенный срок, вы не можете написать отзвы!")
+                setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+            }.create().show()
+        }
+
+        if (isBlocked && !isAdminModerator) {
+            AlertDialog.Builder(this).apply {
+                setTitle("Вы заблокированы")
+                setMessage("Ваш аккаунт является заблокированным на неопределенный срок, вы не можете написать отзвы! Обратитесь к администратору ")
+                setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+            }.create().show()
+        }
+
+        if (!isAuthorized && !isBlocked && !isAdminModerator) {
             AlertDialog.Builder(this).apply {
                 setTitle("Требуется авторизация")
-                setMessage("Для выполнения действия необходима авторизация под пользователем")
+                setMessage("Для выполнения действия необходима авторизация")
                 setPositiveButton("Войти") { _, _ ->
                     startActivity(Intent(context, RegAuthActivity::class.java))
                 }
                 setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
             }.create().show()
-        } else {
+        } else if(isAuthorized && !isBlocked && !isAdminModerator){
             startActivity(Intent(this, LeaveReviewActivity::class.java))
         }
     }
@@ -151,28 +172,10 @@ class AboutUsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadReviews()
-        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
-        val accessToken = prefs.getString("ACCESS_TOKEN", null)
-        val refreshToken = prefs.getString("REFRESH_TOKEN", null)
 
-        val isAuthorized = accessToken != null &&
-                !JWTDecoder.isExpired(accessToken)
-
-        if (!isAuthorized) {
-            showLoginDialog()
-        }
     }
 
-    private fun showLoginDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Сессия истекла")
-            .setMessage("Для продолжения войдите снова")
-            .setPositiveButton("Войти") { _, _ ->
-                startActivity(Intent(this, RegAuthActivity::class.java))
-            }
-            .setCancelable(false)
-            .show()
-    }
+
 
     private fun updateCartCountDisplay() {
         binding.tvCartCount.text = myApplication.cartItemCount.toString()

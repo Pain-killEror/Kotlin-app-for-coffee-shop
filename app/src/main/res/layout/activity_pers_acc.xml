@@ -1,105 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
-    >
-
-    <ImageView
-        android:id="@+id/avatar"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_alignParentStart="true"
-        android:layout_margin="5dp"
-
-        android:src="@drawable/user_photo" /> <!-- Замените на имя вашего изображения -->
-
-    <LinearLayout
-        android:id="@+id/linnerWithName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:textColor="@color/black"
-        android:layout_marginEnd="5dp"
-
-        android:layout_toEndOf="@id/avatar"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/tvPersName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:text="НУну, давай нападай"
-            android:textSize="22sp"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvPersEmail"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="10dp"
-            android:visibility="visible"
-            android:text="НУну, давай навадай"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"
-            android:textSize="13sp" />
-
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Удалить этот аккаунт"
-            android:layout_marginTop="50dp"
-            android:layout_marginRight="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true" />
-    </LinearLayout>
+    android:background="@color/white">
 
 
-    <EditText
-        android:id="@+id/tvSearchName"
-        android:layout_width="250dp"
-        android:layout_height="40dp"
-        android:layout_below="@id/linnerWithName"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
-        android:background="@drawable/stroke_for_tvserchname_persacc"
-        android:hint="Имя пользователя"
-        android:padding="8dp"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:visibility="visible" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tvSearchName"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/btLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Выйти из аккаута"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="78dp"/>
-
+    <!-- Нижняя навигационная панель (остается внизу) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/oval_background"
         android:layout_width="match_parent"
@@ -108,20 +15,15 @@
         android:layout_marginLeft="75dp"
         android:layout_marginRight="75dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/square_toolbar"
         app:cardBackgroundColor="#6A8C4C"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
+        app:cardCornerRadius="30dp">
         <!-- Кнопки внутри овальной рамки -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="16dp">
-
+            <!-- Ваши ImageButton для навигации -->
             <ImageButton
                 android:id="@+id/btnHome"
                 android:layout_width="0dp"
@@ -133,7 +35,7 @@
                 android:maxHeight="30dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_home" />
-
+            <!-- ... остальные кнопки ... -->
             <ImageButton
                 android:id="@+id/btnMenu"
                 android:layout_width="0dp"
@@ -190,4 +92,530 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <LinearLayout
+        android:id="@+id/layoutAccountActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@id/oval_background"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Выйти из аккаунта" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Удалить этот аккаунт" />
+    </LinearLayout>
+
+    <!-- ScrollView для всего остального контента -->
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutAccountActions"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="@dimen/_130sdp"
+                android:layout_height="@dimen/_130sdp"
+                android:layout_alignParentStart="true"
+                android:layout_margin="5dp"
+                android:src="@drawable/user_photo" />
+
+            <LinearLayout
+                android:id="@+id/linnerWithName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/avatar"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_toEndOf="@id/avatar"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPersName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Имя"
+                    android:textColor="@android:color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPersEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Почта"
+                    android:textColor="@android:color/black"
+                    android:textSize="13sp" />
+
+                <Switch
+                    android:id="@+id/switchAdminUsers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_1sdp"
+                    android:textColor="@android:color/black"
+                    android:text="Упр. польз." />
+
+                <Switch
+                    android:id="@+id/switchAnalytics"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_1sdp"
+                    android:textColor="@android:color/black"
+                    android:text="Аналитика" />
+
+                <!-- Кнопка настроек аккаунта и скрытые кнопки -->
+                <ImageButton
+                    android:id="@+id/btnAccountSettings"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_settings"
+                    android:maxWidth="30dp"
+                    android:maxHeight="30dp"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackground"/> <!-- Стандартная иконка настроек -->
+                <!-- android:src="@drawable/ic_settings" /> Замените на свою иконку, если есть -->
+
+
+            </LinearLayout> <!-- конец linnerWithName -->
+
+            <!-- Кнопки Выйти и Удалить, изначально скрыты -->
+
+
+
+            <!-- Блок управления пользователями (поиск и RecyclerView) -->
+            <EditText
+                android:id="@+id/tvSearchName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/avatar"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/stroke_for_tvserchname_persacc"
+                android:hint="Имя пользователя для поиска"
+                android:padding="8dp"
+                android:textColor="@android:color/black"
+                android:visibility="gone"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvSearchName"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
+
+            <!-- Блок для статистики пользователя -->
+            <!-- Блок для статистики пользователя -->
+            <LinearLayout
+                android:id="@+id/statistics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/avatar"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone"> <!-- Управляется isAdmin и неактивными свитчами -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersThisMonth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Совершено заказов за этот месяц:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersThisMonth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" /> <!-- Начальное значение -->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersThisYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Совершено заказов за этот год:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersThisYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersFullPeriod"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Совершено заказов за весь период:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersFullPeriod"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersAverageOrderAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Средняя сумма заказа:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersAverageOrderAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvOrdersTopDishes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginRight="@dimen/_10sdp"
+                    android:text="Топ три часто заказываемых:"
+                    android:visibility="gone"/> <!-- Изначально скрыт, показывается если есть блюда -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvTopDish1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text=""
+                        android:visibility="gone"/>
+                    <TextView
+                        android:id="@+id/tvTopDish2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text=""
+                        android:visibility="gone"/>
+                    <TextView
+                        android:id="@+id/tvTopDish3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text=""
+                        android:visibility="gone"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersTotalSpent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Всего денег потрачено:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersTotalSpent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tvOrdersTotalSaved"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginRight="@dimen/_10sdp"
+                        android:text="Всего денег сохранено скидками:" />
+                    <TextView
+                        android:id="@+id/tvCountOrdersTotalSaved"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:text="-" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+        <!-- Блок Аналитики -->
+        <LinearLayout
+            android:id="@+id/analyticsFull"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/avatar"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+        <!-- Заголовок для сворачивания/разворачивания настроек -->
+        <TextView
+            android:id="@+id/tvAnalyticsSettingsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Параметры анализа ▼"
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textColor="@android:color/black"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <LinearLayout
+            android:id="@+id/analyticsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="gone"> <!-- Изначально скрыт, управляется tvAnalyticsSettingsHeader -->
+
+            <!-- Ваш существующий analyticsHeader с изменениями цвета текста -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Период анализа:"
+                android:textColor="@android:color/black"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+            <Spinner
+                android:id="@+id/spinnerPeriodType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:minHeight="48dp"/>
+            <EditText
+                android:id="@+id/etPeriodYearShared"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Год (ГГГГ)"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/darker_gray"
+                android:inputType="number"
+                android:maxLength="4"
+                android:visibility="gone"/>
+            <LinearLayout
+                android:id="@+id/layoutPeriodDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+                <Spinner
+                    android:id="@+id/spinnerPeriodMonthDetail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:minHeight="48dp"/>
+                <Spinner
+                    android:id="@+id/spinnerPeriodQuarterDetail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:minHeight="48dp"/>
+                <Spinner
+                    android:id="@+id/spinnerPeriodSeasonDetail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:minHeight="48dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutDateRangeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+                <TextView
+                    android:id="@+id/tvPeriodStartDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Начало"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:background="?attr/editTextBackground"
+                    android:clickable="true"
+                    android:focusable="true"/>
+                <TextView
+                    android:id="@+id/tvPeriodEndDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:hint="Конец"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:background="?attr/editTextBackground"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Фильтры:"
+                android:layout_marginTop="16dp"
+                android:textColor="@android:color/black"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+                <Button
+                    android:id="@+id/btnSelectCategories"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Категории..."
+                    android:textAllCaps="false"
+                    android:textColor="?attr/colorPrimary"
+                    android:minHeight="40dp"/>
+                <Button
+                    android:id="@+id/btnSelectDishes"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Блюда..."
+                    android:textAllCaps="false"
+                    android:textColor="?attr/colorPrimary"
+                    android:minHeight="40dp"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tvSelectedCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Категории: все"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp"/>
+            <TextView
+                android:id="@+id/tvSelectedDishes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Блюда: все"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="2dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Метрики:"
+                android:layout_marginTop="16dp"
+                android:textColor="@android:color/black"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <CheckBox android:id="@+id/cbAnalyticsCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@android:color/black" android:text="Кол-во"/>
+                <CheckBox android:id="@+id/cbAnalyticsRevenue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:textColor="@android:color/black" android:text="Выручка"/>
+                <CheckBox android:id="@+id/cbAnalyticsPercentage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:textColor="@android:color/black" android:text="%"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Группировать по:"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/black"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+            <Spinner
+                android:id="@+id/spinnerAnalyticsGroupBy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"/>
+            <Button
+                android:id="@+id/btnFetchAnalytics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="Получить аналитику"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/analyticsBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+            <!-- Сюда будут добавляться результаты аналитики -->
+        </LinearLayout>
+    </LinearLayout> <!-- конец analyticsFull -->
 </RelativeLayout>
+    </ScrollView>
+    </RelativeLayout>

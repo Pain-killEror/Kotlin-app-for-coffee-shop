@@ -54,16 +54,89 @@
             android:layout_marginTop="8dp" />
 
         <!-- Dish Price -->
-        <EditText
-            android:id="@+id/etDishPrice"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Цена блюда"
-            android:textColor="@color/black"
-            android:textColorHint="#717171"
-            android:inputType="numberDecimal"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal">
 
+            <EditText
+                android:id="@+id/etVolume"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:textColor="@color/black"
+                android:textColorHint="#717171"
+                android:hint="Объем1"/>
+
+            <EditText
+                android:id="@+id/etDishPrice"
+                android:layout_width="@dimen/_160sdp"
+                android:layout_height="wrap_content"
+                android:hint="Цена для этого объема"
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"
+                android:textColorHint="#717171" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/volumePrice2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etVolume2"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:textColor="@color/black"
+                android:textColorHint="#717171"
+                android:hint="Объем2"/>
+
+            <EditText
+                android:id="@+id/etDishPrice2"
+                android:layout_width="@dimen/_160sdp"
+                android:layout_height="wrap_content"
+                android:hint="Цена для этого объема"
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"
+                android:textColorHint="#717171" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/volumePrice3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="horizontal"
+
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etVolume3"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:textColor="@color/black"
+                android:textColorHint="#717171"
+                android:hint="Объем3"/>
+
+            <EditText
+                android:id="@+id/etDishPrice3"
+                android:layout_width="@dimen/_160sdp"
+                android:layout_height="wrap_content"
+                android:hint="Цена для этого объема"
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"
+                android:textColorHint="#717171" />
+        </LinearLayout>
         <!-- Dish Category Spinner -->
         <Spinner
             android:id="@+id/spinnerDishCategory"

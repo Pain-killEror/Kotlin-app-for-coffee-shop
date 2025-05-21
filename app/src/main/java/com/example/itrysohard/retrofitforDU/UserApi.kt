@@ -34,7 +34,13 @@ interface UserApi {
     @Headers("Requires-Role: ROLE_ADMIN")
     fun getAllUsers(): Call<List<UserAnswDTO>>
 
+    @POST("/user/promote-to-admin/{id}")
+    // @Headers("Requires-Role: ROLE_MODERATOR") // Добавьте защиту на сервере или здесь, если нужно
+    fun promoteToAdmin(@Path("id") userId: Long): Call<Void>
 
+    @POST("/user/demote-admin/{id}")
+    // @Headers("Requires-Role: ROLE_MODERATOR") // Добавьте защиту на сервере или здесь, если нужно
+    fun demoteAdmin(@Path("id") userId: Long): Call<Void>
 
     @POST("/user/block-user/{id}")
     fun blockUser(@Path("id") userId: Long): Call<Void>
@@ -55,7 +61,7 @@ interface UserApi {
     /*@POST("api/users/save")
     fun save(@Body user: User): Call<User>*/
     @POST("user/create")
-    fun registerUser(@Body user: User): Call<String>
+    fun registerUser(@Body user: User): Call<Map<String, String>>
 
 
 

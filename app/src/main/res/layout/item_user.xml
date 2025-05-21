@@ -18,9 +18,27 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"/>
 
-    <Button
-        android:id="@+id/btnDelete"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <!-- Кнопка Блокировки/Разблокировки -->
+        <Button
+            android:id="@+id/btnBlockUnblock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Заблокировать пользователя"/>
+        android:layout_marginEnd="8dp"
+        android:text="Действие"/>
+
+        <!-- Кнопка Повысить/Понизить -->
+        <Button
+            android:id="@+id/btnPromoteDemote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Роль"
+        android:visibility="gone"/>
+
+    </LinearLayout>
 </LinearLayout>

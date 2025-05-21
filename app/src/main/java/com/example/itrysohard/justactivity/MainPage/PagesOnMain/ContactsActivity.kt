@@ -1,39 +1,26 @@
 package com.example.itrysohard.justactivity.MainPage.PagesOnMain
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.FrameLayout
-import android.widget.ScrollView
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityContactsBinding
-import com.example.itrysohard.databinding.ActivityMyAchievementsBinding
-import com.example.itrysohard.databinding.ActivityReviewDetailBinding
 import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.justactivity.helpfull.CartCount
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
-import com.example.itrysohard.model.CurrentUser
-import com.example.itrysohard.shadow.wrapInCustomShadow
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 import com.example.itrysohard.shadow.wrapInCustomShadowWithOffset
-import kotlin.math.sqrt
 
 
-class ContactsActivity : AppCompatActivity() {
+class ContactsActivity : CartCount() {
     private lateinit var binding: ActivityContactsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,17 +29,17 @@ class ContactsActivity : AppCompatActivity() {
 
         setContentView(binding.main)
 
+        updateCartCountDisplay(binding.tvCartCount)
 
 
+       /* val shadow1 = findViewById<FrameLayout>(R.id.wrapper)
+        wrapInCustomShadowWithOffset(shadow1, R.color.gray, resources, 40)*/
 
-        val shadow1 = findViewById<FrameLayout>(R.id.wrapper)
-        wrapInCustomShadowWithOffset(shadow1, R.color.gray, resources, 40)
+       /* val shadow2 = findViewById<View>(R.id.circle)
+        wrapInCustomShadowWithOffset(shadow2, R.color.gray, resources, 50)*/
 
-        val shadow2 = findViewById<View>(R.id.circle)
-        wrapInCustomShadowWithOffset(shadow2, R.color.gray, resources, 50)
-
-        val shadow4 = findViewById<FrameLayout>(R.id.wrapper2)
-        wrapInCustomShadowWithOffset(shadow4, R.color.gray, resources, 30)
+       /* val shadow4 = findViewById<FrameLayout>(R.id.wrapper2)
+        wrapInCustomShadowWithOffset(shadow4, R.color.gray, resources, 30)*/
 
 
         binding.btnMap.setOnClickListener{

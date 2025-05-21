@@ -10,20 +10,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.BackPress.BackPressManager
+import com.example.itrysohard.MyApplication
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityReviewDetailBinding
 import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
+import com.example.itrysohard.justactivity.helpfull.CartCount
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.jwt.SharedPrefTokenManager
-import com.example.itrysohard.model.CurrentUser
-import com.example.itrysohard.model.Review
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 import com.example.itrysohard.model.answ.ReviewAnswDTO
 import com.example.itrysohard.retrofitforDU.RetrofitService
 import com.example.itrysohard.retrofitforDU.ReviewApi
-import com.example.itrysohard.retrofitforDU.UserApi
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ReviewDetailActivity : AppCompatActivity() {
+class ReviewDetailActivity : CartCount() {
     private lateinit var binding: ActivityReviewDetailBinding
     private lateinit var reviewApi: ReviewApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +39,8 @@ class ReviewDetailActivity : AppCompatActivity() {
         ActivityHistoryImpl.addActivity(this::class.java)
         binding = ActivityReviewDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        updateCartCountDisplay(binding.tvCartCount)
 
         val tokenManager = SharedPrefTokenManager(this)
         val retrofitService = RetrofitService(this, tokenManager)

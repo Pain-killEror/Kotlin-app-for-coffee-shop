@@ -1,14 +1,9 @@
 package com.example.itrysohard.justactivity.menu
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -16,34 +11,35 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import com.example.itrysohard.MyApplication
 import com.example.itrysohard.R
-import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.jwt.JWTDecoder
-import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
-import com.example.itrysohard.retrofitforDU.RetrofitService
-import com.example.itrysohard.retrofitforDU.UserApi
 import com.squareup.picasso.Picasso
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import java.util.Locale
+import kotlin.math.roundToInt
 
-class DishAdapter(private val activity: MenuActivity, private val onDishClick: (DishServ) -> Unit) : RecyclerView.Adapter<DishAdapter.DishViewHolder>() {
-    private val dishes = mutableListOf<DishServ>()
+class DishAdapter(
+    private val activity: MenuActivity,
+    private val onDishClick: (DishServ) -> Unit
+) : RecyclerView.Adapter<DishAdapter.DishViewHolder>() {
 
+    private val groupedDishes = mutableListOf<List<DishServ>>()
+    private val volumeRegex = Regex("""(\d+[\.,]?\d*)""")
 
     fun setDishes(newDishes: List<DishServ>) {
-        dishes.clear()
-        dishes.addAll(newDishes)
+        groupedDishes.clear()
+
+        // Группируем блюда по имени и сортируем по объему
+        newDishes.groupBy { it.name }.values.forEach { group ->
+            val sortedGroup = group.sortedBy { extractVolumeValue(it.volume) }
+            groupedDishes.add(sortedGroup)
+        }
+
         notifyDataSetChanged()
     }
-
-
 
     fun refresh() {
         notifyDataSetChanged()
@@ -55,208 +51,210 @@ class DishAdapter(private val activity: MenuActivity, private val onDishClick: (
     }
 
     override fun onBindViewHolder(holder: DishViewHolder, position: Int) {
-        holder.bind(dishes[position])
+        holder.bind(groupedDishes[position])
     }
 
-    override fun getItemCount(): Int = dishes.size
+    override fun getItemCount(): Int = groupedDishes.size
 
-    class DishViewHolder(itemView: View, private val activity: MenuActivity, private val onDishClick: (DishServ) -> Unit) :
-        RecyclerView.ViewHolder(itemView) {
+    private fun extractVolumeValue(volumeStr: String): Double {
+        val match = volumeRegex.find(volumeStr)?.value?.replace(",", ".")
+        return match?.toDoubleOrNull() ?: 0.0
+    }
+
+    class DishViewHolder(
+        itemView: View,
+        private val activity: MenuActivity,
+        private val onDishClick: (DishServ) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
 
         private val dishImage: ImageView = itemView.findViewById(R.id.ivDishImage)
         private val dishName: TextView = itemView.findViewById(R.id.tvDishName)
-        private var dishPrice: TextView = itemView.findViewById(R.id.tvDishPrice)
+        private val dishPrice: TextView = itemView.findViewById(R.id.tvDishPrice)
         private val btnPlus: ImageButton = itemView.findViewById(R.id.btnPlus)
         private val btnMinus: ImageButton = itemView.findViewById(R.id.btnMinus)
         private val dishCount: TextView = itemView.findViewById(R.id.tvItomCount)
-        private var itemCount = 1
         private val btnAddToCart: ImageButton = itemView.findViewById(R.id.btnAddToCart)
-        private var selectedSize = "S"
         private val btnEdit: ImageButton = itemView.findViewById(R.id.btnEdit)
         private val btnInformation: ImageButton = itemView.findViewById(R.id.btnInformation)
         private val dishDiscount: TextView = itemView.findViewById(R.id.tvDishDiscount)
 
-        private lateinit var dishApi: DishApi
+        private var currentGroup: List<DishServ> = emptyList()
+        private var currentIndex = 0
+        private var itemCount = 1
 
+        fun bind(group: List<DishServ>) {
+            currentGroup = group
+            currentIndex = 0
+            val mainDish = group.first()
 
-        fun bind(dish: DishServ) {
+            // Загрузка изображения
             Picasso.get()
-                .load(dish.photo)
+                .load(mainDish.photo)
                 .resize(500, 500)
                 .centerInside()
                 .into(dishImage)
 
+            dishName.text = mainDish.name
+            updateUI()
 
-            // Рассчитываем сумму скидки
-            val discountAmount = dish.price * (dish.discount / 100.0)
+            // Настройка кнопки редактирования
+            btnEdit.visibility = if (isAdmin()||isModerator()) View.VISIBLE else View.GONE
+            btnEdit.setOnClickListener { handleEditClick(mainDish) }
 
-            // Рассчитываем итоговую сумму
-            val finalPrice = dish.price - discountAmount
-
-            dishName.text = dish.name
-            dishDiscount.text = "${dish.discount} %"
-
-            if(dish.discount <= 0){
-                val params = dishPrice.layoutParams as ViewGroup.MarginLayoutParams
-                dishDiscount.visibility = View.GONE
-                params.bottomMargin = 20
-                dishPrice.layoutParams = params
-
-                dishPrice.text = "${dish.price} р."
-            }
-            else{
-                dishDiscount.visibility = View.VISIBLE
-                val params = dishPrice.layoutParams as ViewGroup.MarginLayoutParams
-                params.bottomMargin = 0
-                dishPrice.layoutParams = params
-
-                dishPrice.text = "${finalPrice} р."
+            // Настройка кнопки информации
+            btnInformation.setOnClickListener {
+                showInformationDialog(mainDish.description, mainDish.name)
             }
 
+            // Обработчики кнопок объема
+            btnPlus.setOnClickListener {
+                if (currentIndex < currentGroup.size - 1) {
+                    currentIndex++
+                    updateUI()
+                }
+            }
 
+            btnMinus.setOnClickListener {
+                if (currentIndex > 0) {
+                    currentIndex--
+                    updateUI()
+                }
+            }
 
-            btnEdit.visibility = if (isAdmin()) View.VISIBLE else View.GONE
-
-
-            btnEdit.setOnClickListener {
-                if (dish.id != -1) {
-                    val intent = Intent(activity, AddDishActivity::class.java).apply {
-                        putExtra("dish_id", dish.id)
-                        putExtra("dish_name", dish.name)
-                        putExtra("dish_description", dish.description)
-                        putExtra("dish_price", dish.price)
-                        putExtra("dish_image_uri", dish.photo)
-                        putExtra("dish_category", dish.category)
-                        putExtra("dish_discount", dish.discount)
-                    }
-                    activity.startActivity(intent)
-
+            // Обработчик добавления в корзину
+            btnAddToCart.setOnClickListener {
+                val selectedDish = currentGroup[currentIndex]
+                if (selectedDish.category == "Напиток") {
+                    addToCartDrink(selectedDish, itemCount)
                 } else {
-                    showToast(activity, "Некорректный идентификатор блюда")
+                    addToCartDish(selectedDish, itemCount)
                 }
-            }
-
-            btnInformation.setOnClickListener{
-                showInformationDialog(dish.description, dish.name)
-            }
-
-            if(dish.category == "Напиток") {
-                dishCount.text = "S"
-                btnPlus.setOnClickListener {
-                    if (itemCount < 3) itemCount++
-                    when (itemCount) {
-                        1 -> {
-                            dishCount.text = "S"
-                            selectedSize = "S"
-                        }
-
-                        2 -> {
-                            dishCount.text = "M"
-                            selectedSize = "M"
-                        }
-
-                        3 -> {
-                            dishCount.text = "L"
-                            selectedSize = "L"
-                        }
-                    }
-                }
-
-                btnMinus.setOnClickListener {
-                    if (itemCount > 1) itemCount--
-                    when (itemCount) {
-                        1 -> {
-                            dishCount.text = "S"
-                            selectedSize = "S"
-                        }
-
-                        2 -> {
-                            dishCount.text = "M"
-                            selectedSize = "M"
-                        }
-
-                        3 -> {
-                            dishCount.text = "L"
-                            selectedSize = "L"
-                        }
-                    }
-                }
-                btnAddToCart.setOnClickListener {
-                    addToCartDrink(dish, itemView.context, selectedSize)
-                    activity.updateCartCountDisplay()
-                }
-
-            } else {
-
-                itemCount = 1
-                dishCount.text = itemCount.toString()
-
-                btnPlus.setOnClickListener {
-                    itemCount++
-                    dishCount.text = itemCount.toString()
-                }
-                btnMinus.setOnClickListener {
-                    if (itemCount > 1) {
-                        itemCount--
-                        dishCount.text = itemCount.toString()
-                    }
-                }
-
-                btnAddToCart.setOnClickListener {
-                    addToCartDish(dish, itemView.context, itemCount)
-                    activity.updateCartCountDisplay()
-                    itemCount = 1
-                    dishCount.text = itemCount.toString()
-                }
+                activity.updateCartCountDisplay()
             }
         }
+
+        private fun updateUI() {
+            val dish = currentGroup[currentIndex]
+
+            // Рассчет цены со скидкой
+
+
+            // Обновление отображения цены
+            val price = dish.price.toDouble()
+            val discount = dish.discount.toDouble()
+
+            if (discount <= 0) {
+                dishDiscount.visibility = View.GONE
+                dishPrice.text = "%.2f р.".format(price)
+            } else {
+                val discountAmount = price * (discount / 100.0)
+                val finalPrice = price - discountAmount
+                dishDiscount.visibility = View.VISIBLE
+                dishDiscount.text = "${discount.toInt()}%"
+                dishPrice.text = "%.2f р.".format(finalPrice)
+            }
+
+            // Обновление отображения объема
+            dishCount.text = when {
+                currentGroup.size == 1 -> dish.volume
+                dish.category == "Напиток" -> when (currentIndex) {
+                    0 -> "S"
+                    1 -> "M"
+                    else -> "L"
+                }
+                else -> dish.volume
+            }
+
+            // Управление видимостью кнопок
+            btnPlus.visibility = if (currentGroup.size > 1) View.VISIBLE else View.GONE
+            btnMinus.visibility = if (currentGroup.size > 1) View.VISIBLE else View.GONE
+            btnPlus.isEnabled = currentIndex < currentGroup.size - 1
+            btnMinus.isEnabled = currentIndex > 0
+        }
+
+        private fun handleEditClick(mainDish: DishServ) {
+            val allVariants = currentGroup
+            val intent = Intent(activity, AddDishActivity::class.java).apply {
+                putExtra("dish_id", mainDish.id) // Основной ID (берем первый)
+                putExtra("dish_name", mainDish.name)
+                putExtra("dish_description", mainDish.description)
+                putExtra("dish_category", mainDish.category)
+                putExtra("dish_discount", mainDish.discount)
+                putExtra("dish_image_uri", mainDish.photo) // URI изображения
+
+                // Передаем все варианты объемов и цен
+                putStringArrayListExtra("volumes", ArrayList(allVariants.map { it.volume }))
+                putStringArrayListExtra("prices", ArrayList(allVariants.map { it.price.toString() }))
+
+                // Передаем все ID вариантов
+                putIntegerArrayListExtra("dish_ids", ArrayList(allVariants.map { it.id!!.toInt() }))
+            }
+            activity.startActivity(intent)
+        }
+
+        private fun addToCartDish(dish: DishServ, count: Int) {
+            val app = activity.application as MyApplication
+            repeat(count) {
+                app.cartItems.add(dish.copy()) // Сохраняем оригинальную цену
+            }
+            app.cartItemCount += count
+        }
+
+        private fun addToCartDrink(dish: DishServ, count: Int) {
+            val app = activity.application as MyApplication
+            val selectedSize = when (currentIndex) {
+                0 -> "S"
+                1 -> "M"
+                else -> "L"
+            }
+
+            dish.id?.let { app.selectedSizes[it.toLong()] = selectedSize }
+            app.cartItems.add(dish.copy()) // Сохраняем оригинальную цену
+            app.cartItemCount += count
+        }
+
 
         private fun isAdmin(): Boolean {
             val prefs = itemView.context.getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
             val accessToken = prefs.getString("ACCESS_TOKEN", null)
             return JWTDecoder.getRole(accessToken) == "ROLE_ADMIN"
         }
-
-        private fun addToCartDish(dish: DishServ, context: Context, count: Int) {
-            val app = context.applicationContext as MyApplication
-            repeat(count) {
-                app.cartItems.add(dish)
-            }
-            app.cartItemCount += count
-        }
-
-        private fun addToCartDrink(dish: DishServ, context: Context, size: String) {
-            val app = context.applicationContext as MyApplication
-            selectedSize?.let { size ->
-                app.selectedSizes[dish.id!!] = size
-            }
-            app.cartItems.add(dish)
-            app.cartItemCount += 1
+        private fun isModerator(): Boolean {
+            val prefs = itemView.context.getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+            val accessToken = prefs.getString("ACCESS_TOKEN", null)
+            val role = JWTDecoder.getRole(accessToken)
+            return JWTDecoder.getRole(accessToken) == "ROLE_MODERATOR"
         }
 
         private fun showInformationDialog(description: String, name: String) {
+            // 1. Создаем Builder
             val builder = AlertDialog.Builder(activity, R.style.CustomAlertDialog)
-            val inflater = activity.layoutInflater
-            val dialogView = inflater.inflate(R.layout.dialog_dish_info, null)
-            builder.setView(dialogView)
 
-            val tvDescription: TextView = dialogView.findViewById(R.id.tvDescription)
-            val btnClose: Button = dialogView.findViewById(R.id.btnClose)
-            val tvDishName: TextView = dialogView.findViewById(R.id.tvDishName)
-            tvDescription.text = description
-            tvDishName.text = name
-            val dialog = builder.create()
+            // 2. Инфлейтим кастомный layout
+            val view = activity.layoutInflater.inflate(R.layout.dialog_dish_info, null)
 
+            // 3. Настраиваем View внутри layout'а
+            view.findViewById<TextView>(R.id.tvDescription).text = description
+            view.findViewById<TextView>(R.id.tvDishName).text = name
+            val btnClose = view.findViewById<Button>(R.id.btnClose) // Получаем кнопку
+
+            // 4. Устанавливаем View для Builder'а
+            builder.setView(view)
+
+            // 5. Создаем AlertDialog (но пока не показываем)
+            val dialog = builder.create() // Получаем ссылку на созданный диалог
+
+            // 6. Назначаем OnClickListener для кнопки ЗДЕСЬ, используя ссылку на 'dialog'
             btnClose.setOnClickListener {
-                dialog.dismiss()
+                dialog.dismiss() // Теперь закрываем правильный диалог
             }
 
+            // 7. Показываем диалог
             dialog.show()
         }
 
-        // Метод showToast для отображения сообщений
-        private fun showToast(context: Context, message: String) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        private fun showToast(message: String) {
+            Toast.makeText(itemView.context, message, Toast.LENGTH_SHORT).show()
         }
     }
 }

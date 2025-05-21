@@ -26,7 +26,7 @@ import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.jwt.JWTDecoder
 import com.example.itrysohard.jwt.SharedPrefTokenManager
-import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
@@ -303,6 +303,7 @@ class MenuActivity : AppCompatActivity() {
             val updatedCartCount = data?.getIntExtra("cart_count", 0) ?: 0
             cartCount = updatedCartCount
             updateCartCount(cartCount)
+            loadDishes()
         }
     }
 
@@ -318,6 +319,13 @@ class MenuActivity : AppCompatActivity() {
         return JWTDecoder.getRole(accessToken) == "ROLE_ADMIN"
     }
 
+    private fun isModerator(): Boolean {
+        val prefs = getSharedPreferences("secure_prefs", Context.MODE_PRIVATE)
+        val accessToken = prefs.getString("ACCESS_TOKEN", null)
+        val role = JWTDecoder.getRole(accessToken)
+        return JWTDecoder.getRole(accessToken) == "ROLE_MODERATOR"
+    }
+
     override fun onResume() {
         super.onResume()
         val isAdmin = isAdmin()
@@ -327,7 +335,7 @@ class MenuActivity : AppCompatActivity() {
         loadDishes()
         cartCount = (application as MyApplication).cartItems.size
         updateCartCount(cartCount)
-        binding.btnAddDish.visibility = if (isAdmin()) View.VISIBLE else View.GONE
+        binding.btnAddDish.visibility = if (isAdmin()||isModerator()) View.VISIBLE else View.GONE
         breakfastAdapter.refresh()
         dessertAdapter.refresh()
         drinkAdapter.refresh()

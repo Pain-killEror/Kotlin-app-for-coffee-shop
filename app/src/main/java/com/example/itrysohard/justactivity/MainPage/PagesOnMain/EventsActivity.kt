@@ -2,23 +2,17 @@ package com.example.itrysohard.justactivity.MainPage.PagesOnMain
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.itrysohard.BackPress.ActivityHistoryImpl
 import com.example.itrysohard.BackPress.BackPressManager
-import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityEventsBinding
-import com.example.itrysohard.databinding.ActivityMyAchievementsBinding
-import com.example.itrysohard.databinding.ActivityReviewDetailBinding
 import com.example.itrysohard.justactivity.MainPage.StartActivity
 import com.example.itrysohard.justactivity.PersonalPage.PersAccActivity
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
-import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 
 class EventsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEventsBinding

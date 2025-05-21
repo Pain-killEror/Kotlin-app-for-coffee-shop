@@ -23,13 +23,17 @@ interface DishApi {
         @Part("name") name: RequestBody,
         @Part("description") description: RequestBody,
         @Part("price") price: RequestBody,
-        @Part photo: MultipartBody.Part, // имя параметра "photo" должно совпадать с сервером
+        @Part("volume") volume: RequestBody,
+        @Part photo: MultipartBody.Part?, // имя параметра "photo" должно совпадать с сервером
         @Part("category") category: RequestBody, // исправлено имя параметра
         @Part("discount") discount: RequestBody
     ): Call<ResponseBody> // Измените тип ответа, так как сервер возвращает No Content
 
     @DELETE("/dishes/delete/{id}")
-    fun deleteDish(@Path("id") id: Int): Call<Void>
+    fun deleteDish(@Path("id") id: Long): Call<Void>
+
+    @DELETE("/dishes/deleteByName/{name}")
+    fun deleteDishByName(@Path("name") name: String): Call<Void>
 
     @Multipart
     @PUT("/dishes/update/{id}")
@@ -38,6 +42,7 @@ interface DishApi {
         @Part("name") name: RequestBody,
         @Part("description") description: RequestBody,
         @Part("price") price: RequestBody,
+        @Part("volume") volume: RequestBody,
         @Part("category") category: RequestBody,
         @Part photo: MultipartBody.Part? = null, // имя параметра "photo" (обязательно!)
         @Part("discount") discount: RequestBody

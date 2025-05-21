@@ -35,4 +35,101 @@
     <string name='cart'></string>
 
 
+    <string-array name="analytics_period_types">
+        <item>За все время</item>
+        <item>Год</item>
+        <item>Месяц</item>
+        <item>Квартал</item>
+        <item>Сезон</item>
+        <item>Диапазон дат</item>
+    </string-array>
+
+
+    <string name="analytics_period_all_time">За все время</string>
+    <string name="analytics_period_year">Год</string>
+    <string name="analytics_period_month">Месяц</string>
+    <string name="analytics_period_quarter">Квартал</string>
+    <string name="analytics_period_season">Сезон</string>
+    <string name="analytics_period_range">Диапазон дат</string>
+
+    <string-array name="analytics_months_display">
+        <item>Выберите месяц</item>
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+    <!-- API значения для месяцев (если отличаются от простого номера 1-12) -->
+    <!-- Если сервер ожидает числа "1".."12", этот массив можно не использовать, а генерировать в коде -->
+    <string-array name="analytics_months_api_values">
+        <item>1</item> <item>2</item> <item>3</item> <item>4</item> <item>5</item> <item>6</item>
+        <item>7</item> <item>8</item> <item>9</item> <item>10</item> <item>11</item> <item>12</item>
+    </string-array>
+
+    <string-array name="analytics_quarters_display">
+        <item>Выберите квартал</item>
+        <item>1-й квартал</item>
+        <item>2-й квартал</item>
+        <item>3-й квартал</item>
+        <item>4-й квартал</item>
+    </string-array>
+    <!-- API значения для кварталов (1, 2, 3, 4) не нуждаются в отдельном массиве, можно использовать позицию + 1 -->
+
+
+    <string-array name="analytics_seasons_display">
+        <item>Выберите сезон</item>
+        <item>Зима</item>
+        <item>Весна</item>
+        <item>Лето</item>
+        <item>Осень</item>
+    </string-array>
+    <string-array name="analytics_seasons_api_values">
+        <item>winter</item>
+        <item>spring</item>
+        <item>summer</item>
+        <item>autumn</item>
+    </string-array>
+
+    <string name="analytics_settings_header_collapsed">Параметры анализа ▼</string>
+    <string name="analytics_settings_header_expanded">Параметры анализа ▲</string>
+
+    <string name="analytics_filter_categories_all">Категории: все</string>
+    <string name="analytics_filter_categories_prefix">Категории:</string>
+    <string name="analytics_filter_dishes_all">Блюда: все</string>
+    <string name="analytics_filter_dishes_prefix">Блюда:</string>
+
+
+    <string-array name="analytics_group_by_display">
+        <item>Без группировки</item>
+        <item>По категории</item>
+        <item>По блюду</item>
+        <item>По году</item>
+        <item>По месяцу</item>
+        <item>По кварталу</item>
+        <item>По сезону</item>
+        <item>По неделе</item>
+    </string-array>
+    <string-array name="analytics_group_by_api_values">
+        <item></item> <!-- Пустое значение для "Без группировки" -->
+        <item>category</item>
+        <item>dish</item>
+        <item>year</item>
+        <item>month</item>
+        <item>quarter</item>
+        <item>season</item>
+        <item>week</item>
+    </string-array>
+
+    <string name="analytics_hint_start_date">Начало</string>
+    <string name="analytics_hint_end_date">Конец</string>
+
+
 </resources>

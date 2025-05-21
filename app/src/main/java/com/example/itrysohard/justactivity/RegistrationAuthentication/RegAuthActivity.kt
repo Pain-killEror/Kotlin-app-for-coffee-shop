@@ -55,11 +55,11 @@ class RegAuthActivity : AppCompatActivity() {
             if (binding.etPassReg.transformationMethod is PasswordTransformationMethod) {
                 // Показать пароль
                 binding.etPassReg.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                binding.showPasswordButton.setImageResource(R.drawable.icon_edit)
+                binding.showPasswordButton.setImageResource(R.drawable.icon_show_pass)
             } else {
                 // Скрыть пароль
                 binding.etPassReg.transformationMethod = PasswordTransformationMethod.getInstance()
-                binding.showPasswordButton.setImageResource(R.drawable.icon_plus)
+                binding.showPasswordButton.setImageResource(R.drawable.icon_hide_pass)
             }
             // Переместить курсор в конец текста
             binding.etPassReg.setSelection(binding.etPassReg.text.length)
@@ -69,11 +69,11 @@ class RegAuthActivity : AppCompatActivity() {
             if (binding.etPassRegSec.transformationMethod is PasswordTransformationMethod) {
                 // Показать пароль
                 binding.etPassRegSec.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                binding.showPasswordButtonSec.setImageResource(R.drawable.icon_edit)
+                binding.showPasswordButtonSec.setImageResource(R.drawable.icon_show_pass)
             } else {
                 // Скрыть пароль
                 binding.etPassRegSec.transformationMethod = PasswordTransformationMethod.getInstance()
-                binding.showPasswordButtonSec.setImageResource(R.drawable.icon_plus)
+                binding.showPasswordButtonSec.setImageResource(R.drawable.icon_hide_pass)
             }
             // Переместить курсор в конец текста
             binding.etPassRegSec.setSelection(binding.etPassRegSec.text.length)
@@ -114,12 +114,17 @@ class RegAuthActivity : AppCompatActivity() {
 
         val newUser = User(name, email, password2)                           // !!!!!!!!!!!!!
 
-        userApi.registerUser(newUser).enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
+        userApi.registerUser(newUser).enqueue(object : Callback<Map<String, String>> {
+            override fun onResponse(
+                call: Call<Map<String, String>>,
+                response: Response<Map<String, String>>
+            ) {
                 if (response.isSuccessful) {
-                    val message = response.body() // "Registration was successful"
+                    // Извлекаем сообщение из JSON-объекта
+                    val message = response.body()?.get("message") ?: "Регистрация прошла успешно"
                     clearFields()
-                    showToast(message!!)
+                    showToast(message)
+                    // Переход на другую активность
                     val lastActivity = ActivityHistoryImpl.getSecondToLastActivity()
                     if (lastActivity != null) {
                         startActivity(Intent(this@RegAuthActivity, lastActivity))
@@ -133,7 +138,7 @@ class RegAuthActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<String>, t: Throwable) {
+            override fun onFailure(call: Call<Map<String, String>>, t: Throwable) {
                 showToast("Ошибка сети: ${t.message}")
             }
         })

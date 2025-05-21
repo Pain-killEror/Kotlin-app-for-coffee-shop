@@ -1,4 +1,6 @@
-package com.example.itrysohard.model
+package com.example.itrysohard.justactivity.helpfull
+
+import com.example.itrysohard.model.User
 
 //for kotlin serv
 

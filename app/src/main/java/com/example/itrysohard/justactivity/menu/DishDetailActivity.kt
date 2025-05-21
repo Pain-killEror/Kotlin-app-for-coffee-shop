@@ -19,7 +19,7 @@ import com.example.itrysohard.MyApplication
 import com.example.itrysohard.databinding.ActivityDishDetailBinding
 import com.example.itrysohard.justactivity.RegistrationAuthentication.RegAuthActivity
 import com.example.itrysohard.jwt.SharedPrefTokenManager
-import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 import com.example.itrysohard.model.DishServ
 import com.example.itrysohard.retrofitforDU.DishApi
 import com.example.itrysohard.retrofitforDU.RetrofitService
@@ -48,6 +48,7 @@ class DishDetailActivity : AppCompatActivity() {
         val description = intent.getStringExtra("DISH_DESCRIPTION") ?: "Описание отсутствует"
         val imageUri = intent.getStringExtra("DISH_IMAGE_URL")
         val price = intent.getDoubleExtra("DISH_PRICE", 0.0)
+        val volume = intent.getStringExtra("DISH_VOLUME") ?: "Информация об объеме отсутствует"
         val dishId = intent.getIntExtra("DISH_ID", -1)
         val category = intent.getStringExtra("DISH_CATEGORY") ?: "Неизвестная категория"
         val discount = intent.getIntExtra("DISH_DISCOUNT", 0)
@@ -76,13 +77,13 @@ class DishDetailActivity : AppCompatActivity() {
         binding.btnAddToCart.visibility = if (isAdmin) View.GONE else View.VISIBLE
 
         // Обработчики для кнопок
-        setupButtons(dishId, name, description, price, imageUri, category, discount)
+        setupButtons(dishId, name, description, price, volume, imageUri, category, discount)
 
         // Настраиваем кнопки размеров
         setupSizeButtons()
     }
 
-    private fun setupButtons(dishId: Int, name: String, description: String, price: Double, imageUri: String?, category: String, discount: Int) {
+    private fun setupButtons(dishId: Int, name: String, description: String, price: Double, volume: String, imageUri: String?, category: String, discount: Int) {
         binding.btnDelete.setOnClickListener {
             if (dishId != -1) {
                 deleteDish(dishId)
@@ -98,6 +99,7 @@ class DishDetailActivity : AppCompatActivity() {
                     putExtra("dish_name", name)
                     putExtra("dish_description", description)
                     putExtra("dish_price", price)
+                    putExtra("dish_volume", volume)
                     putExtra("dish_image_uri", imageUri)
                     putExtra("dish_discount", discount)
                 }
@@ -114,6 +116,7 @@ class DishDetailActivity : AppCompatActivity() {
                 name = name,
                 description = description,
                 price = price.toInt().toByte(),
+                volume = volume,
                 photo = imageUri,
                 category = category,
                 discount = discount.toByte()
@@ -171,7 +174,7 @@ class DishDetailActivity : AppCompatActivity() {
 
         // Сохраняем выбранный размер в словаре по id блюда
         selectedSize?.let { size ->
-            app.selectedSizes[dish.id!!] = size
+            app.selectedSizes[dish.id!!.toLong()] = size
         }
 
         // Добавляем блюдо в корзину
@@ -205,7 +208,7 @@ class DishDetailActivity : AppCompatActivity() {
         val tokenManager = SharedPrefTokenManager(this)
         val retrofitService = RetrofitService(this, tokenManager)
         val dishApi = retrofitService.getRetrofit().create(DishApi::class.java)
-        val call: Call<Void> = dishApi.deleteDish(id)
+        val call: Call<Void> = dishApi.deleteDish(id.toLong())
 
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {

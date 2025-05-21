@@ -24,7 +24,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|top"
-
             android:clipToPadding="false"
             android:padding="12dp">
 
@@ -62,7 +61,7 @@
 
     </FrameLayout>
 
-    <FrameLayout
+   <!-- <FrameLayout
         android:id="@+id/circleDown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,10 +82,10 @@
             android:orientation="vertical">
 
         </View>
-        <!-- Круглый элемент в верхнем левом углу -->
-    </FrameLayout>
+        &lt;!&ndash; Круглый элемент в верхнем левом углу &ndash;&gt;
+    </FrameLayout>-->
 
-    <FrameLayout
+    <!--<FrameLayout
         android:id="@+id/frameLayout3"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -111,9 +110,9 @@
                 android:orientation="vertical">
 
             </View>
-            <!-- Круглый элемент в верхнем левом углу -->
+            &lt;!&ndash; Круглый элемент в верхнем левом углу &ndash;&gt;
         </FrameLayout>
-    </FrameLayout>
+    </FrameLayout>-->
 
     <FrameLayout
         android:id="@+id/wrapper2"
@@ -202,7 +201,7 @@
         app:layout_constraintTop_toTopOf="@+id/guidelineInst" />
 
 
-    <androidx.cardview.widget.CardView
+   <!-- <androidx.cardview.widget.CardView
         android:id="@+id/oval_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -214,7 +213,7 @@
         app:layout_constraintStart_toStartOf="@id/guidelinePanelLeft"
         app:layout_constraintTop_toTopOf="@id/guidelinePanelDown">
 
-        <!-- Кнопки внутри овальной рамки -->
+        &lt;!&ndash; Кнопки внутри овальной рамки &ndash;&gt;
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -304,7 +303,90 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>-->
+
+
+
+    <!-- Кнопки внутри овальной рамки -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/square_toolbar"
+        app:cardBackgroundColor="#6A8C4C"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnHome"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackground"
+            android:maxWidth="30dp"
+            android:maxHeight="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_home" />
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackground"
+            android:maxWidth="30dp"
+            android:maxHeight="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_menu" />
+
+        <RelativeLayout
+            android:id="@+id/rlCart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/btnCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackground"
+                android:maxWidth="30dp"
+                android:maxHeight="30dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_shopping_bag" />
+
+            <TextView
+                android:id="@+id/tvCartCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_toRightOf="@id/btnCart"
+                android:text="0"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/btnPersAcc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="?attr/selectableItemBackground"
+            android:maxWidth="30dp"
+            android:maxHeight="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/icon_user" />
+    </LinearLayout>
+
 
 
     <androidx.constraintlayout.widget.Guideline

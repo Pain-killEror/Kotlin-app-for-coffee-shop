@@ -12,7 +12,6 @@ import com.example.itrysohard.BackPress.BackPressManager
 import com.example.itrysohard.R
 import com.example.itrysohard.databinding.ActivityLeaveReviewBinding
 import com.example.itrysohard.jwt.SharedPrefTokenManager
-import com.example.itrysohard.model.CurrentUser
 import com.example.itrysohard.model.Review
 import com.example.itrysohard.retrofitforDU.ReviewApi
 import com.example.itrysohard.retrofitforDU.RetrofitService

@@ -8,6 +8,7 @@ data class DishServ(
     var name: String,
     var description: String,
     var price: Byte,
+    var volume: String,
     var photo: String?,
     var category: String,
     var discount: Byte
@@ -18,6 +19,7 @@ data class DishServ(
         name = parcel.readString() ?: "",
         description = parcel.readString() ?: "", // считываем description
         price = parcel.readByte(),
+        volume = parcel.readString() ?: "",
         photo = parcel.readString(),
         category = parcel.readString() ?: "", // считываем category
         discount = parcel.readByte()
@@ -28,6 +30,7 @@ data class DishServ(
         parcel.writeString(name)
         parcel.writeString(description) // записываем description
         parcel.writeByte(price)
+        parcel.writeString(volume)
         parcel.writeString(photo)
         parcel.writeString(category) // записываем category
         parcel.writeByte(discount)
@@ -48,6 +51,6 @@ data class DishServ(
     }
 
     override fun toString(): String {
-        return "DishServ(id=$id, name='$name', price=$price, photo=$photo, category='$category'), discount=$discount"
+        return "DishServ(id=$id, name='$name', price=$price,volume=$volume , photo=$photo, category='$category'), discount=$discount"
     }
 }

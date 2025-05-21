@@ -20,17 +20,26 @@ class RetrofitService(private val context: Context, private val tokenManager: To
 
         val gson = GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss") // Формат даты с сервера
+            .setLenient() // Добавьте эту строку
             .create()
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.0.105:8080/")
+            .baseUrl("http://192.168.0.154:8080/")
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
     fun getRetrofit(): Retrofit {
         return retrofit
+    }
+
+    fun getOrderApi(): OrderApi {
+        return getRetrofit().create(OrderApi::class.java)
+    }
+
+    fun getDishApi(): DishApi {
+        return getRetrofit().create(DishApi::class.java)
     }
 
     fun getUserApi(): UserApi {

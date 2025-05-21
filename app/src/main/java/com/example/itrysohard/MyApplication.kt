@@ -7,7 +7,7 @@ import com.example.itrysohard.model.DishServ
 class MyApplication : Application() {
     val cartItems = mutableListOf<DishServ>()
     var cartItemCount: Int = 0
-    var selectedSizes = mutableMapOf<Int, String?>()
+    val selectedSizes = mutableMapOf<Long, String>()
 
 
     override fun onCreate() {

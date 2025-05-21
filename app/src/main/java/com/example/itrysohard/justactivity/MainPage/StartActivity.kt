@@ -22,17 +22,14 @@ import com.example.itrysohard.justactivity.about_us.AboutUsActivity
 import com.example.itrysohard.justactivity.menu.cart.CartActivity
 import com.example.itrysohard.justactivity.menu.MenuActivity
 import com.example.itrysohard.jwt.JWTDecoder
-import com.example.itrysohard.jwt.LoginResponse
 import com.example.itrysohard.jwt.RefreshTokenResponse
-import com.example.itrysohard.model.CurrentUser
+import com.example.itrysohard.justactivity.helpfull.CurrentUser
 import com.example.itrysohard.model.User
-import com.example.itrysohard.jwt.SecurityHelper
 import com.example.itrysohard.jwt.SharedPrefTokenManager
-import com.example.itrysohard.jwt.TokenManager
 
 import android.util.Base64
 import android.util.Log
-import com.example.itrysohard.jwt.AuthInterceptor
+import com.example.itrysohard.justactivity.helpfull.CartCount
 import com.example.itrysohard.jwt.RefreshRequest
 import com.example.itrysohard.retrofitforDU.UserApi
 import org.json.JSONObject
@@ -42,19 +39,19 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class StartActivity : AppCompatActivity() {
+class StartActivity : CartCount(){
 
     private lateinit var binding: ActivityStartBinding
     private var isUserLoggedIn: Boolean = false
     private var userName: String? = null
     private var userEmail: String? = null
-    private lateinit var myApplication: MyApplication
+
     private lateinit var loginActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var logoutActivityResultLauncher: ActivityResultLauncher<Intent>
     private val tokenManager by lazy { SharedPrefTokenManager(this) }
     private val userApi: UserApi by lazy {
         Retrofit.Builder()
-            .baseUrl("http://192.168.0.105:8080/") 
+            .baseUrl("http://192.168.0.154:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(UserApi::class.java)
@@ -67,7 +64,7 @@ class StartActivity : AppCompatActivity() {
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        updateCartCountDisplay(binding.tvCartCount)
 
         // Инициализация ActivityResultLauncher для получения результата из MainActivity (вход)
         /*loginActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -101,8 +98,7 @@ class StartActivity : AppCompatActivity() {
             finish()
         }
 
-        myApplication = application as MyApplication
-        updateCartCountDisplay()
+
 
         binding.btnCart.setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
@@ -172,15 +168,6 @@ class StartActivity : AppCompatActivity() {
         }
     }
 
-    private fun openYandexMap() {
-        // Укажите название заведения или места
-        val placeName = "ДжоДжо" // Замените на нужное название
-        val uri = "https://yandex.ru/maps/?text=${Uri.encode(placeName)}"
-
-        // Создаем Intent для открытия URL в браузере
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-        startActivity(intent)
-    }
 
     private fun showAuthorizationDialogPers() {
         val tokenManager = SharedPrefTokenManager(this)
@@ -210,7 +197,7 @@ class StartActivity : AppCompatActivity() {
         if (!isFinishing) { // Проверка, что активити не в процессе завершения
             checkAuthState()
         }
-        updateCartCountDisplay()
+        updateCartCountDisplay(binding.tvCartCount)
     }
 
 
@@ -244,20 +231,7 @@ class StartActivity : AppCompatActivity() {
 
 
 
-    private fun checkTokensAndRefresh() {
-        val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
-        val accessToken = sharedPref.getString("ACCESS_TOKEN", null)
-        val refreshToken = sharedPref.getString("REFRESH_TOKEN", null)
 
-        when {
-            refreshToken == null || isTokenExpired(refreshToken) -> {
-                startActivity(Intent(this, RegAuthActivity::class.java))
-                finish()
-            }
-            accessToken == null || isTokenExpired(accessToken) -> refreshAccessToken()
-            else -> return // Оба токена валидны
-        }
-    }
 
     private fun refreshAccessToken() {
         val refreshToken = tokenManager.getRefreshToken()
@@ -304,29 +278,6 @@ class StartActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun isTokenExpired(token: String): Boolean {
-        return try {
-            val payload = token.split(".")[1]
-            val json = String(Base64.decode(payload, Base64.URL_SAFE), Charsets.UTF_8)
-            val expTime = JSONObject(json).getLong("exp") * 1000
-            expTime < System.currentTimeMillis()
-        } catch (e: Exception) {
-            true
-        }
-    }
-
-    private fun showLoginDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Сессия истекла")
-            .setMessage("Для продолжения войдите снова")
-            .setPositiveButton("Войти") { _, _ ->
-                startActivity(Intent(this, RegAuthActivity::class.java))
-            }
-            .setNegativeButton("Отмена") {  dialog, _ -> dialog.dismiss()
-            }
-            .setCancelable(false)
-            .show()
-    }
 
 
 
@@ -362,8 +313,6 @@ class StartActivity : AppCompatActivity() {
         Toast.makeText(this, "Вы вышли из аккаунта", Toast.LENGTH_SHORT).show()
     }
 
-    private fun updateCartCountDisplay() {
-        binding.tvCartCount.text = myApplication.cartItemCount.toString()
-    }
+
 
 }
